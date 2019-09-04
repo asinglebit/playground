@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "baseUrl": "source",
+        "allowJs": true,
+        "checkJs": true,
+        "noEmit": true,
+        "jsx": "react",
+        "target": "es5"
+    },
+    "include": [
+        "source/common/helpers/math.js"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}
