@@ -19,8 +19,8 @@ import {
  */
 
 import CubeVertexShader from "common/shaders/cube.vertex.glsl";
-import CubeFragmentShader from "common/shaders/cube.fragment.glsl";
-// import CubeFragmentShader from "common/shaders/full_screen_quad.fragment.glsl";
+//import CubeFragmentShader from "common/shaders/cube.fragment.glsl";
+import CubeFragmentShader from "common/shaders/full_screen_quad.fragment.glsl";
 // import CubeVertexShader from "common/shaders/texture.vertex.glsl";
 // import CubeFragmentShader from "common/shaders/texture.fragment.glsl";
 
