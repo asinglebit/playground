@@ -18,11 +18,11 @@ import {
  * Shaders
  */
 
-// import CubeVertexShader from "common/shaders/cube.vertex.glsl";
-//import CubeFragmentShader from "common/shaders/cube.fragment.glsl";
-//import CubeFragmentShader from "common/shaders/full_screen_quad.fragment.glsl";
-import CubeVertexShader from "common/shaders/texture.vertex.glsl";
-import CubeFragmentShader from "common/shaders/texture.fragment.glsl";
+import CubeVertexShader from "common/shaders/cube.vertex.glsl";
+import CubeFragmentShader from "common/shaders/cube.fragment.glsl";
+// import CubeFragmentShader from "common/shaders/full_screen_quad.fragment.glsl";
+// import CubeVertexShader from "common/shaders/texture.vertex.glsl";
+// import CubeFragmentShader from "common/shaders/texture.fragment.glsl";
 
 //
 // Initialize a texture and load an image.
@@ -51,7 +51,6 @@ function loadTexture(gl, url) {
   
     const image = new Image();
     image.onload = function() {
-        console.log('asd')
       gl.bindTexture(gl.TEXTURE_2D, texture);
       gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
                     srcFormat, srcType, image);
@@ -144,6 +143,12 @@ export function Rect(_scene, Primitive) {
         _scene._context.linkProgram(this._shader_program);
 
         this._texture = loadTexture(_scene._context, ImageButton);
+
+        // this._btn = document.createElement("BUTTON");
+        // this._btn.innerHTML = "CLICK ME";
+        // this._btn.innerHTML = "CLICK ME";
+        // this._btn.setAttribute("style", `position: absolute; top: 0; left: 0; transform: translateX(${10}px) translateY(${10}px) rotateZ(${10}deg)`);
+        // document.body.appendChild(this._btn);
     };
 
     /**
@@ -304,6 +309,8 @@ export function Rect(_scene, Primitive) {
                 this._points[3].x, this._points[3].y, 0.0,
                 this._points[1].x, this._points[1].y, 0.0
             ]);
+
+            //this._btn && this._btn.setAttribute("style", `height: ${this._width * 26}px; width: ${this._height * 26}px; position: absolute; top: 0; left: 0; transform: translateX(${ (this._position.x*29+370)}px) translateY(${_scene._canvas.height - (this._position.y*29+455)}px) rotateZ(${-this._rotation +90}deg)`);
     
             const quad_vertex_buffer = _scene._context.createBuffer();
             _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, quad_vertex_buffer);

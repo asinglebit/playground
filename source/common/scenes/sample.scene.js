@@ -9,6 +9,7 @@ export const init = container => {
     const Rect = scene.factory().Rect;
 
     const rects = new Array(100).fill(null).map((value, index) => {
+
         const rect = new Rect()
             .width(1.0)
             .height(4.0)
@@ -18,8 +19,6 @@ export const init = container => {
             .append(rect)
         return rect;
     })
-
-    const rect2 = new Rect();
     
     window.addEventListener('resize', function(event) {
         scene.resize();
