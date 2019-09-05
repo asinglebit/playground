@@ -80,6 +80,8 @@ export function Scene(container, name, width, height) {
      */
 
     this._context = this._canvas.getContext('webgl2');
+    this._context.enable(this._context.DEPTH_TEST);
+    this._context.depthFunc(this._context.LEQUAL);
 
     /**
      * Resizing the scene
@@ -91,26 +93,28 @@ export function Scene(container, name, width, height) {
      * TODO: move this out of here
      */
 
-    const shader_program = this._context.createProgram();
-    const vertex_shader = this._context.createShader(this._context.VERTEX_SHADER);
-    const fragment_shader = this._context.createShader(this._context.FRAGMENT_SHADER);
-    this._context.shaderSource(vertex_shader, QuadVertexShader);
-    this._context.shaderSource(fragment_shader, QuadFragmentShader);
-    this._context.compileShader(vertex_shader);
-    this._context.compileShader(fragment_shader);
-    this._context.attachShader(shader_program, vertex_shader);
-    this._context.attachShader(shader_program, fragment_shader);
-    this._context.linkProgram(shader_program);
-    this._context.useProgram(shader_program);
-    const uniformLocation = this._context.getUniformLocation(shader_program, "iTime");    
-    const vertexPositionAttribute = this._context.getAttribLocation(shader_program, "v_position");
-    const quad_vertex_buffer = this._context.createBuffer();
-    this._context.bindBuffer(this._context.ARRAY_BUFFER, quad_vertex_buffer);
-    this._context.bufferData(this._context.ARRAY_BUFFER, MeshQuad, this._context.STATIC_DRAW);
-    this._context.vertexAttribPointer(vertexPositionAttribute, 3, this._context.FLOAT, false, 0, 0);
-    this._context.enableVertexAttribArray(vertexPositionAttribute);
-    this._context.drawArrays(this._context.TRIANGLES, 0, 6);
-    this._context.uniform1f(uniformLocation, (+new Date()) * 0.001);
+    // const shader_program = this._context.createProgram();
+    // const vertex_shader = this._context.createShader(this._context.VERTEX_SHADER);
+    // const fragment_shader = this._context.createShader(this._context.FRAGMENT_SHADER);
+    // this._context.shaderSource(vertex_shader, QuadVertexShader);
+    // this._context.shaderSource(fragment_shader, QuadFragmentShader);
+    // this._context.compileShader(vertex_shader);
+    // this._context.compileShader(fragment_shader);
+    // this._context.attachShader(shader_program, vertex_shader);
+    // this._context.attachShader(shader_program, fragment_shader);
+    // this._context.linkProgram(shader_program);
+    // this._context.useProgram(shader_program);
+
+    // const uniformLocation = this._context.getUniformLocation(shader_program, "iTime");    
+    // const vertexPositionAttribute = this._context.getAttribLocation(shader_program, "v_position");
+
+    // const quad_vertex_buffer = this._context.createBuffer();
+    // this._context.bindBuffer(this._context.ARRAY_BUFFER, quad_vertex_buffer);
+    // this._context.bufferData(this._context.ARRAY_BUFFER, MeshQuad, this._context.STATIC_DRAW);
+    // this._context.vertexAttribPointer(vertexPositionAttribute, 3, this._context.FLOAT, false, 0, 0);
+    // this._context.enableVertexAttribArray(vertexPositionAttribute);
+    // this._context.drawArrays(this._context.TRIANGLES, 0, 6);
+    // this._context.uniform1f(uniformLocation, (+new Date()) * 0.001);
 
     function get_projection(angle, a, zMin, zMax) {
         var ang = Math.tan((angle*.5)*Math.PI/180);
@@ -158,7 +162,20 @@ Scene.prototype.resize = function(width, height) {
      * Resize WebGL context
      */
 
-    this._context.viewport(0.0, 0.0, this._canvas.width, this._canvas.height) 
+    this._context.viewport(0.0, 0.0, this._canvas.width, this._canvas.height)
+    this._context.clearColor(0.5, 0.5, 0.5, 0.9);
+    this._context.clearDepth(1.0);
+    function get_projection(angle, a, zMin, zMax) {
+        var ang = Math.tan((angle*.5)*Math.PI/180);
+        return [
+           0.5/ang, 0 , 0, 0,
+           0, 0.5*a/ang, 0, 0,
+           0, 0, -(zMax+zMin)/(zMax-zMin), -1,
+           0, 0, (-2*zMax*zMin)/(zMax-zMin), 0 
+        ];
+     }
+        
+    this._proj_matrix = get_projection(40, this._canvas.width / this._canvas.height, 1, 100);
 
     /**
      * Resize the root node of the tree
@@ -272,6 +289,12 @@ Scene.prototype.render = function() {
     for (let i = 0; i < dirty.length; ++i) {
         dirty[i].cascade();
     }
+
+    // Clear
+
+    this._context.clearColor(0.5, 0.5, 0.5, 0.9);
+    this._context.clearDepth(1.0);
+    this._context.clear(this._context.COLOR_BUFFER_BIT | this._context.DEPTH_BUFFER_BIT);
 
     // Iterate over the depth buffer and render all of the primitives
 

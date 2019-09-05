@@ -15,20 +15,75 @@ import {
 } from "common/utils/math";
 
 /**
- * Meshes
- */
-
-import {
-    CubeVertices,
-    CubeIndices
-} from "common/meshes/cube";
-
-/**
  * Shaders
  */
 
-import CubeVertexShader from "common/shaders/cube.vertex.glsl";
-import CubeFragmentShader from "common/shaders/cube.fragment.glsl";
+// import CubeVertexShader from "common/shaders/cube.vertex.glsl";
+//import CubeFragmentShader from "common/shaders/cube.fragment.glsl";
+//import CubeFragmentShader from "common/shaders/full_screen_quad.fragment.glsl";
+import CubeVertexShader from "common/shaders/texture.vertex.glsl";
+import CubeFragmentShader from "common/shaders/texture.fragment.glsl";
+
+//
+// Initialize a texture and load an image.
+// When the image finished loading copy it into the texture.
+//
+function loadTexture(gl, url) {
+    const texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+  
+    // Because images have to be download over the internet
+    // they might take a moment until they are ready.
+    // Until then put a single pixel in the texture so we can
+    // use it immediately. When the image has finished downloading
+    // we'll update the texture with the contents of the image.
+    const level = 0;
+    const internalFormat = gl.RGBA;
+    const width = 1;
+    const height = 1;
+    const border = 0;
+    const srcFormat = gl.RGBA;
+    const srcType = gl.UNSIGNED_BYTE;
+    const pixel = new Uint8Array([0, 0, 255, 255]);  // opaque blue
+    gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+                  width, height, border, srcFormat, srcType,
+                  pixel);
+  
+    const image = new Image();
+    image.onload = function() {
+        console.log('asd')
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+                    srcFormat, srcType, image);
+  
+      // WebGL1 has different requirements for power of 2 images
+      // vs non power of 2 images so check if the image is a
+      // power of 2 in both dimensions.
+      if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
+         // Yes, it's a power of 2. Generate mips.
+         gl.generateMipmap(gl.TEXTURE_2D);
+      } else {
+         // No, it's not a power of 2. Turn off mips and set
+         // wrapping to clamp to edge
+         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      }
+    };
+    image.src = url;
+  
+    return texture;
+  }
+  
+  function isPowerOf2(value) {
+    return (value & (value - 1)) == 0;
+  }
+
+/**
+ * Assets
+ */
+
+import ImageButton from "common/textures/button.png";
 
 export function Rect(_scene, Primitive) {
 
@@ -77,33 +132,18 @@ export function Rect(_scene, Primitive) {
          */
 
         this._height = 0;
+        this._shader_program = _scene._context.createProgram();
+        const vertex_shader = _scene._context.createShader(_scene._context.VERTEX_SHADER);
+        const fragment_shader = _scene._context.createShader(_scene._context.FRAGMENT_SHADER);
+        _scene._context.shaderSource(vertex_shader, CubeVertexShader);
+        _scene._context.shaderSource(fragment_shader, CubeFragmentShader);
+        _scene._context.compileShader(vertex_shader);
+        _scene._context.compileShader(fragment_shader);
+        _scene._context.attachShader(this._shader_program, vertex_shader);
+        _scene._context.attachShader(this._shader_program, fragment_shader);
+        _scene._context.linkProgram(this._shader_program);
 
-
-        // Create and store data into vertex buffer
-        const vertex_buffer = _scene._context.createBuffer();
-        _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, vertex_buffer);
-        _scene._context.bufferData(_scene._context.ARRAY_BUFFER, new Float32Array(CubeVertices), _scene._context.STATIC_DRAW);
-        // Create and store data into index buffer
-        this._index_buffer = _scene._context.createBuffer();
-        _scene._context.bindBuffer(_scene._context.ELEMENT_ARRAY_BUFFER, this._index_buffer);
-        _scene._context.bufferData(_scene._context.ELEMENT_ARRAY_BUFFER, new Uint16Array(CubeIndices), _scene._context.STATIC_DRAW);
-        const vertShader = _scene._context.createShader(_scene._context.VERTEX_SHADER);
-        _scene._context.shaderSource(vertShader, CubeVertexShader);
-        _scene._context.compileShader(vertShader);
-        const fragShader = _scene._context.createShader(_scene._context.FRAGMENT_SHADER);
-        _scene._context.shaderSource(fragShader, CubeFragmentShader);
-        _scene._context.compileShader(fragShader);
-        this._shaderProgram = _scene._context.createProgram();
-        _scene._context.attachShader(this._shaderProgram, vertShader);
-        _scene._context.attachShader(this._shaderProgram, fragShader);
-        _scene._context.linkProgram(this._shaderProgram);
-
-        _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, vertex_buffer);
-        var position = _scene._context.getAttribLocation(this._shaderProgram, "position");
-        _scene._context.vertexAttribPointer(position, 3, _scene._context.FLOAT, false,0,0) ;
-        _scene._context.enableVertexAttribArray(position);
-        _scene._context.useProgram(this._shaderProgram);
-
+        this._texture = loadTexture(_scene._context, ImageButton);
     };
 
     /**
@@ -114,13 +154,13 @@ export function Rect(_scene, Primitive) {
         if (x !== undefined || y !== undefined) {
             if (x !== undefined) {
                 this._at.x = (x !== undefined) && x || this._at.x;
-                const half_width = this._width >>> 1;
+                const half_width = this._width / 1;
                 this._points[0].x = this._points[2].x = this._at.x - half_width;
                 this._points[1].x = this._points[3].x = this._at.x + half_width;
             }
             if (y !== undefined) {
                 this._at.y = (y !== undefined) && y || this._at.y;
-                const half_height = this._height >>> 1;
+                const half_height = this._height / 2;
                 this._points[0].y = this._points[1].y = this._at.y + half_height;
                 this._points[2].y = this._points[3].y = this._at.y - half_height;
             }
@@ -153,7 +193,7 @@ export function Rect(_scene, Primitive) {
     Rect.prototype.width = function (width) {
         if (width) {
             this._width = width;
-            const half_width = width >>> 1;
+            const half_width = width / 2;
             this._points[0].x = this._points[2].x = this._at.x - half_width;
             this._points[1].x = this._points[3].x = this._at.x + half_width;
             return this;
@@ -169,7 +209,7 @@ export function Rect(_scene, Primitive) {
     Rect.prototype.height = function (height) {
         if (height) {
             this._height = height;
-            const half_height = height >>> 1;
+            const half_height = height / 2;
             this._points[0].y = this._points[1].y = this._at.y + half_height;
             this._points[2].y = this._points[3].y = this._at.y - half_height;
             return this;
@@ -225,23 +265,55 @@ export function Rect(_scene, Primitive) {
             /**
              * Setup transformations and render
              */
-            var Pmatrix = _scene._context.getUniformLocation(this._shaderProgram, "Pmatrix");
-            var Vmatrix = _scene._context.getUniformLocation(this._shaderProgram, "Vmatrix");
-            var Mmatrix = _scene._context.getUniformLocation(this._shaderProgram, "Mmatrix");
 
-            _scene._context.enable(_scene._context.DEPTH_TEST);
-            _scene._context.depthFunc(_scene._context.LEQUAL);
-            _scene._context.clearColor(0.5, 0.5, 0.5, 0.9);
-            _scene._context.clearDepth(1.0);
+            _scene._context.useProgram(this._shader_program);
+            
+            const vertexPositionAttribute = _scene._context.getAttribLocation(this._shader_program, "position");
+            var Pmatrix = _scene._context.getUniformLocation(this._shader_program, "Pmatrix");
+            var Vmatrix = _scene._context.getUniformLocation(this._shader_program, "Vmatrix");
+            var Mmatrix = _scene._context.getUniformLocation(this._shader_program, "Mmatrix");
 
-            _scene._context.clear(_scene._context.COLOR_BUFFER_BIT | _scene._context.DEPTH_BUFFER_BIT);
+            const textureCoordBuffer = _scene._context.createBuffer();
+            _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, textureCoordBuffer);
+            const textureCoordinates = [
+                1.0,  1.0,
+                1.0,  0.0,
+                0.0,  1.0,
+                
+                0.0,  1.0,
+                1.0,  0.0,
+                0.0,  0.0,
+            ]
+            _scene._context.bufferData(_scene._context.ARRAY_BUFFER, new Float32Array(textureCoordinates), _scene._context.STATIC_DRAW);
+
+            const textureCoord = _scene._context.getAttribLocation(this._shader_program, 'aTextureCoord');
+            const uSampler = _scene._context.getUniformLocation(this._shader_program, 'uSampler');
+
+            _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, textureCoordBuffer);
+            _scene._context.vertexAttribPointer(textureCoord, 2, _scene._context.FLOAT, false, 0, 0);
+            _scene._context.enableVertexAttribArray(textureCoord);
+            _scene._context.activeTexture(_scene._context.TEXTURE0);
+            _scene._context.bindTexture(_scene._context.TEXTURE_2D, this._texture);
+            _scene._context.uniform1i(uSampler, 0);
+
+            const MeshQuad = new Float32Array([ 
+                this._points[2].x, this._points[2].y, 0.0,
+                this._points[3].x, this._points[3].y, 0.0,
+                this._points[0].x, this._points[0].y, 0.0,
+                this._points[0].x, this._points[0].y, 0.0,
+                this._points[3].x, this._points[3].y, 0.0,
+                this._points[1].x, this._points[1].y, 0.0
+            ]);
+    
+            const quad_vertex_buffer = _scene._context.createBuffer();
+            _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, quad_vertex_buffer);
+            _scene._context.bufferData(_scene._context.ARRAY_BUFFER, MeshQuad, _scene._context.STATIC_DRAW);
+            _scene._context.vertexAttribPointer(vertexPositionAttribute, 3, _scene._context.FLOAT, false, 0, 0);
+            _scene._context.enableVertexAttribArray(vertexPositionAttribute);
+            _scene._context.drawArrays(_scene._context.TRIANGLES, 0, 6);
             _scene._context.uniformMatrix4fv(Pmatrix, false, _scene._proj_matrix);
             _scene._context.uniformMatrix4fv(Vmatrix, false, _scene._view_matrix);
-            _scene._context.uniformMatrix4fv(Mmatrix, false, this._matrix_cascaded);
-            _scene._context.bindBuffer(_scene._context.ELEMENT_ARRAY_BUFFER, this._index_buffer);
-            _scene._context.drawElements(_scene._context.TRIANGLES, CubeIndices.length, _scene._context.UNSIGNED_SHORT, 0);
-
-			
+            _scene._context.uniformMatrix4fv(Mmatrix, false, this._matrix_cascaded);			
         }
     };
 

@@ -7,7 +7,18 @@ export const init = container => {
     const scene = manager.new(container, 'scene');
     const root = scene.root();
     const Rect = scene.factory().Rect;
-    const rect = new Rect();
+
+    const rects = new Array(100).fill(null).map((value, index) => {
+        const rect = new Rect()
+            .width(1.0)
+            .height(4.0)
+            .rotate(90)
+            .translate(index % 10 * 2 - 10, index  % 5 - 10)
+        root
+            .append(rect)
+        return rect;
+    })
+
     const rect2 = new Rect();
     
     window.addEventListener('resize', function(event) {
@@ -16,30 +27,16 @@ export const init = container => {
     
     scene.render();
     
-    rect
-        .pivot(0, 0)
-        .width(300)
-        .height(100);
-    rect2
-        .pivot(0, 0)
-        .width(300)
-        .height(100);
 
     let a = 0;
     setInterval(() => {
-        a += 0.01;
-        rect
-            .translate(Math.sin(a)*10, Math.cos(a)*10)
-            .rotate(Math.sin(a)*1000)
-        rect2
-            .translate(Math.cos(a)*10, Math.sin(a)*10)
-            .rotate(Math.sin(a)*1000)
+        a += 0.001;
+        rects.map((rect, index) => {
+            rect
+               .translate(index % 10 * 2 - 10 + Math.sin(a * 100),  index  / 3 - 10 +  Math.cos(a * 100))
+                .rotate(Math.sin(a)*1000)
+        })
     }, 1000 / 60)
     
-    root
-        .append(rect)
-        .append(rect2);
-    
     scene.start();
-    console.log(root)
 }
