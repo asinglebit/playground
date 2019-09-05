@@ -1,12 +1,18 @@
-import * as glMatrix from 'gl-matrix';
-var vec2 = glMatrix.vec2;
-
+import {
+    vec2,
+    vec3,
+    mat4,
+    quat
+} from 'gl-matrix';
 import {
     BBox
 } from 'common/core/bbox';
 import {
     inherit
 } from "common/utils/helper";
+import {
+    deg_to_rad
+} from "common/utils/math";
 
 /**
  * Meshes
@@ -223,8 +229,6 @@ export function Rect(_scene, Primitive) {
             var Vmatrix = _scene._context.getUniformLocation(this._shaderProgram, "Vmatrix");
             var Mmatrix = _scene._context.getUniformLocation(this._shaderProgram, "Mmatrix");
 
-            var mov_matrix = this._matrix_cascaded;
-
             _scene._context.enable(_scene._context.DEPTH_TEST);
             _scene._context.depthFunc(_scene._context.LEQUAL);
             _scene._context.clearColor(0.5, 0.5, 0.5, 0.9);
@@ -233,10 +237,11 @@ export function Rect(_scene, Primitive) {
             _scene._context.clear(_scene._context.COLOR_BUFFER_BIT | _scene._context.DEPTH_BUFFER_BIT);
             _scene._context.uniformMatrix4fv(Pmatrix, false, _scene._proj_matrix);
             _scene._context.uniformMatrix4fv(Vmatrix, false, _scene._view_matrix);
-            _scene._context.uniformMatrix4fv(Mmatrix, false, [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
+            _scene._context.uniformMatrix4fv(Mmatrix, false, this._matrix_cascaded);
             _scene._context.bindBuffer(_scene._context.ELEMENT_ARRAY_BUFFER, this._index_buffer);
             _scene._context.drawElements(_scene._context.TRIANGLES, CubeIndices.length, _scene._context.UNSIGNED_SHORT, 0);
-				
+
+			
         }
     };
 

@@ -17,26 +17,6 @@ export function inherit(child, parent) {
 };
 
 /**
- * Convert a glmatrix mat3 object to an array
- */
-
-export function matrix_to_array(matrix) {
-    var _matrix = [];
-    for (let i = 0; i < matrix.length; ++i) {
-        _matrix.push(matrix[i]);
-    }
-    return _matrix;
-};
-
-/**
- * Convert a glmatrix mat3 object to an array canvas transformation function accepts
- */
-
-export function glmatrix_to_canvas_matrix(matrix) {
-    return [matrix[0], matrix[1], matrix[3], matrix[4], matrix[6], matrix[7]];
-}
-
-/**
  * Get a random color
  */
 

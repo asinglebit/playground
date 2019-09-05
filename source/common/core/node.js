@@ -1,7 +1,7 @@
-import * as glMatrix from 'gl-matrix';
-const vec2 = glMatrix.vec2;
-const mat3 = glMatrix.mat3;
-
+import{
+    vec3,
+    mat4
+} from 'gl-matrix';
 import {
     BBox
 } from 'common/core/bbox';
@@ -55,13 +55,13 @@ export function Node(_scene) {
          * Current nodes transformation matrix
          */
 
-        this._matrix_own = mat3.create();
+        this._matrix_own = mat4.create();
 
         /**
          * Current nodes cascaded transformation matrix
          */
 
-        this._matrix_cascaded = mat3.create();
+        this._matrix_cascaded = mat4.create();
 
         /**
          * Child nodes of the current node
@@ -95,7 +95,7 @@ export function Node(_scene) {
      */
 
     Node.prototype.reset = function() {
-        this._matrix_own = mat3.create();
+        this._matrix_own = mat4.create();
         this._pivot.x = 0;
         this._pivot.y = 0;
         this._position.x = 0;
@@ -154,10 +154,10 @@ export function Node(_scene) {
 
             this._position.x = (x !== undefined) && x || this._position.x;
             this._position.y = (y !== undefined) && -y || this._position.y;
-            this._matrix_own = mat3.create();
-            mat3.translate(this._matrix_own, this._matrix_own, vec2.fromValues(this._position.x, this._position.y));
-            mat3.rotate(this._matrix_own, this._matrix_own, deg_to_rad(this._rotation));
-            mat3.scale(this._matrix_own, this._matrix_own, vec2.fromValues(this._scale.x, this._scale.y));
+            this._matrix_own = mat4.create();
+            mat4.translate(this._matrix_own, this._matrix_own, vec3.fromValues(this._position.x, this._position.y, 0));
+            mat4.rotateZ(this._matrix_own, this._matrix_own, deg_to_rad(this._rotation));
+            mat4.scale(this._matrix_own, this._matrix_own, vec3.fromValues(this._scale.x, this._scale.y, 1));
             this._dirty = true;
             return this;
         } else {
@@ -191,16 +191,16 @@ export function Node(_scene) {
     Node.prototype.rotate = function(rotation) {
         if (rotation !== undefined) {
             this._rotation = trim_angle(rotation);
-            this._matrix_own = mat3.create();
-            mat3.translate(this._matrix_own, this._matrix_own, vec2.fromValues(this._position.x, this._position.y));
+            this._matrix_own = mat4.create();
+            mat4.translate(this._matrix_own, this._matrix_own, vec3.fromValues(this._position.x, this._position.y, 0));
             if (this._pivot.x !== 0 || this._pivot.y !== 0) {
-                mat3.translate(this._matrix_own, this._matrix_own, vec2.fromValues(this._pivot.x, this._pivot.y));
-                mat3.rotate(this._matrix_own, this._matrix_own, deg_to_rad(this._rotation));
-                mat3.scale(this._matrix_own, this._matrix_own, vec2.fromValues(this._scale.x, this._scale.y));
-                mat3.translate(this._matrix_own, this._matrix_own, vec2.fromValues(-this._pivot.x, -this._pivot.y));
+                mat4.translate(this._matrix_own, this._matrix_own, vec3.fromValues(this._pivot.x, this._pivot.y, 0));
+                mat4.rotateZ(this._matrix_own, this._matrix_own, deg_to_rad(this._rotation));
+                mat4.scale(this._matrix_own, this._matrix_own, vec3.fromValues(this._scale.x, this._scale.y, 1));
+                mat4.translate(this._matrix_own, this._matrix_own, vec3.fromValues(-this._pivot.x, -this._pivot.y, 0));
             } else {
-                mat3.rotate(this._matrix_own, this._matrix_own, deg_to_rad(this._rotation));
-                mat3.scale(this._matrix_own, this._matrix_own, vec2.fromValues(this._scale.x, this._scale.y));
+                mat4.rotateZ(this._matrix_own, this._matrix_own, deg_to_rad(this._rotation));
+                mat4.scale(this._matrix_own, this._matrix_own, vec3.fromValues(this._scale.x, this._scale.y, 1));
             }
             this._dirty = true;
             return this;
@@ -217,16 +217,16 @@ export function Node(_scene) {
         if (x !== undefined || y !== undefined) {
             this._scale.x = (x !== undefined) ? x : this._scale.x;
             this._scale.y = (y !== undefined) ? y : this._scale.y;
-            this._matrix_own = mat3.create();
-            mat3.translate(this._matrix_own, this._matrix_own, vec2.fromValues(this._position.x, this._position.y));
+            this._matrix_own = mat4.create();
+            mat4.translate(this._matrix_own, this._matrix_own, vec3.fromValues(this._position.x, this._position.y, 0));
             if (this._pivot.x !== 0 || this._pivot.y !== 0) {
-                mat3.translate(this._matrix_own, this._matrix_own, vec2.fromValues(this._pivot.x, this._pivot.y));
-                mat3.rotate(this._matrix_own, this._matrix_own, deg_to_rad(this._rotation));
-                mat3.scale(this._matrix_own, this._matrix_own, vec2.fromValues(this._scale.x, this._scale.y));
-                mat3.translate(this._matrix_own, this._matrix_own, vec2.fromValues(-this._pivot.x, -this._pivot.y));
+                mat4.translate(this._matrix_own, this._matrix_own, vec3.fromValues(this._pivot.x, this._pivot.y, 1));
+                mat4.rotateZ(this._matrix_own, this._matrix_own, deg_to_rad(this._rotation));
+                mat4.scale(this._matrix_own, this._matrix_own, vec3.fromValues(this._scale.x, this._scale.y, 1));
+                mat4.translate(this._matrix_own, this._matrix_own, vec3.fromValues(-this._pivot.x, -this._pivot.y, 0));
             } else {
-                mat3.rotate(this._matrix_own, this._matrix_own, deg_to_rad(this._rotation));
-                mat3.scale(this._matrix_own, this._matrix_own, vec2.fromValues(this._scale.x, this._scale.y));
+                mat4.rotateZ(this._matrix_own, this._matrix_own, deg_to_rad(this._rotation));
+                mat4.scale(this._matrix_own, this._matrix_own, vec3.fromValues(this._scale.x, this._scale.y, 1));
             }
             this._dirty = true;
             return this;
@@ -259,7 +259,7 @@ export function Node(_scene) {
      */
 
     Node.prototype.matrixOwn = function() {
-        return mat3.clone(this._matrix_own);
+        return mat4.clone(this._matrix_own);
     };
 
     /**
@@ -267,7 +267,7 @@ export function Node(_scene) {
      */
 
     Node.prototype.matrixCascaded = function() {
-        return mat3.clone(this._matrix_cascaded);
+        return mat4.clone(this._matrix_cascaded);
     };
 
     /**
@@ -400,9 +400,9 @@ export function Node(_scene) {
 
     Node.prototype.cascade = function() {
         if (this.parent()) {
-            mat3.multiply(this._matrix_cascaded, this.parent()._matrix_cascaded, this._matrix_own);
+            mat4.multiply(this._matrix_cascaded, this.parent()._matrix_cascaded, this._matrix_own);
         } else {
-            this._matrix_cascaded = mat3.clone(this._matrix_own);
+            this._matrix_cascaded = mat4.clone(this._matrix_own);
         }
         for (let i = 0; i < this._children.length; ++i) {
             this._children[i].cascade();

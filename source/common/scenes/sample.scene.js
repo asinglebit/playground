@@ -16,10 +16,15 @@ export const init = container => {
     scene.render();
     
     rect
-        .at(250, 0)
-        .pivot(250, 0)
+        .pivot(0, 0)
         .width(100)
         .height(100);
+
+    let a = 0;
+    setInterval(() => {
+        a += 0.01;
+        rect.translate(Math.sin(a)*10, Math.cos(a)*10)
+    }, 1000 / 60)
     
     root
         .append(rect);

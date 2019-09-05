@@ -123,7 +123,7 @@ export function Scene(container, name, width, height) {
      }
         
     this._proj_matrix = get_projection(40, this._canvas.width / this._canvas.height, 1, 100);
-    this._view_matrix = [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,-6,1];
+    this._view_matrix = [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,-20,1];
 
     /**
      * User defined callback
@@ -168,7 +168,7 @@ Scene.prototype.resize = function(width, height) {
     const rotate = this._root.rotate();
     this._root
         .reset()
-        .translate(this._canvas.width / 2, -this._canvas.height / 2)
+        .translate(0, 0)
         .scale(scale.x, scale.y)
         .rotate(rotate);
     return this;
@@ -279,7 +279,7 @@ Scene.prototype.render = function() {
     for (let i = 0; i < primitives.length; ++i) {
         primitives[i].render();
     }
-    console.log(primitives)
+    
     return this;
 };
 
