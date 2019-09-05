@@ -68,6 +68,7 @@
         "express": "4.16.4",
         "fetch-mock": "7.3.1",
         "fs-path": "0.0.24",
+        "gl-matrix": "^3.1.0",
         "isomorphic-fetch": "2.2.1",
         "jsdoc": "^3.5.5",
         "jsdom": "14.0.0",

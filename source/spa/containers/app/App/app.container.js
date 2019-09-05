@@ -12,8 +12,8 @@ import {
     connect
 } from 'react-redux';
 import {
-    initialize
-} from 'common/scene';
+    init
+} from 'common/scenes/sample.scene';
 
 /**
  * Actions
@@ -45,8 +45,8 @@ export class App extends Component {
      * Hooks
      */
 
-    handleCanvasRef = canvasRef => {
-        initialize(canvasRef)
+    handleRootReference = (container) => {
+        init(container)
     }
 
     /**
@@ -57,10 +57,8 @@ export class App extends Component {
         return (
             <div 
                 className="app-root"
+                ref={this.handleRootReference}
             >
-                <canvas
-                    ref={this.handleCanvasRef}
-                />
             </div>
         );
     }
