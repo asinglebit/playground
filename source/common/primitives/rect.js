@@ -141,14 +141,7 @@ export function Rect(_scene, Primitive) {
         _scene._context.attachShader(this._shader_program, vertex_shader);
         _scene._context.attachShader(this._shader_program, fragment_shader);
         _scene._context.linkProgram(this._shader_program);
-
         this._texture = loadTexture(_scene._context, ImageButton);
-
-        this._btn = document.createElement("BUTTON");
-        this._btn.innerHTML = "CLICK ME";
-        this._btn.innerHTML = "CLICK ME";
-        this._btn.setAttribute("style", `position: absolute; top: 0; left: 0; transform: translateX(${10}px) translateY(${10}px) rotateZ(${10}deg)`);
-        document.body.appendChild(this._btn);
     };
 
     /**
@@ -271,56 +264,54 @@ export function Rect(_scene, Primitive) {
              * Setup transformations and render
              */
 
-            // _scene._context.useProgram(this._shader_program);
+            _scene._context.useProgram(this._shader_program);
             
-            // const vertexPositionAttribute = _scene._context.getAttribLocation(this._shader_program, "position");
-            // var Pmatrix = _scene._context.getUniformLocation(this._shader_program, "Pmatrix");
-            // var Vmatrix = _scene._context.getUniformLocation(this._shader_program, "Vmatrix");
-            // var Mmatrix = _scene._context.getUniformLocation(this._shader_program, "Mmatrix");
+            const vertexPositionAttribute = _scene._context.getAttribLocation(this._shader_program, "position");
+            var Pmatrix = _scene._context.getUniformLocation(this._shader_program, "Pmatrix");
+            var Vmatrix = _scene._context.getUniformLocation(this._shader_program, "Vmatrix");
+            var Mmatrix = _scene._context.getUniformLocation(this._shader_program, "Mmatrix");
 
-            // const textureCoordBuffer = _scene._context.createBuffer();
-            // _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, textureCoordBuffer);
-            // const textureCoordinates = [
-            //     1.0,  1.0,
-            //     1.0,  0.0,
-            //     0.0,  1.0,
+            const textureCoordBuffer = _scene._context.createBuffer();
+            _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, textureCoordBuffer);
+            const textureCoordinates = [
+                1.0,  1.0,
+                1.0,  0.0,
+                0.0,  1.0,
                 
-            //     0.0,  1.0,
-            //     1.0,  0.0,
-            //     0.0,  0.0,
-            // ]
-            // _scene._context.bufferData(_scene._context.ARRAY_BUFFER, new Float32Array(textureCoordinates), _scene._context.STATIC_DRAW);
+                0.0,  1.0,
+                1.0,  0.0,
+                0.0,  0.0,
+            ]
+            _scene._context.bufferData(_scene._context.ARRAY_BUFFER, new Float32Array(textureCoordinates), _scene._context.STATIC_DRAW);
 
-            // const textureCoord = _scene._context.getAttribLocation(this._shader_program, 'aTextureCoord');
-            // const uSampler = _scene._context.getUniformLocation(this._shader_program, 'uSampler');
+            const textureCoord = _scene._context.getAttribLocation(this._shader_program, 'aTextureCoord');
+            const uSampler = _scene._context.getUniformLocation(this._shader_program, 'uSampler');
 
-            // _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, textureCoordBuffer);
-            // _scene._context.vertexAttribPointer(textureCoord, 2, _scene._context.FLOAT, false, 0, 0);
-            // _scene._context.enableVertexAttribArray(textureCoord);
-            // _scene._context.activeTexture(_scene._context.TEXTURE0);
-            // _scene._context.bindTexture(_scene._context.TEXTURE_2D, this._texture);
-            // _scene._context.uniform1i(uSampler, 0);
+            _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, textureCoordBuffer);
+            _scene._context.vertexAttribPointer(textureCoord, 2, _scene._context.FLOAT, false, 0, 0);
+            _scene._context.enableVertexAttribArray(textureCoord);
+            _scene._context.activeTexture(_scene._context.TEXTURE0);
+            _scene._context.bindTexture(_scene._context.TEXTURE_2D, this._texture);
+            _scene._context.uniform1i(uSampler, 0);
 
-            // const MeshQuad = new Float32Array([ 
-            //     this._points[2].x, this._points[2].y, 0.0,
-            //     this._points[3].x, this._points[3].y, 0.0,
-            //     this._points[0].x, this._points[0].y, 0.0,
-            //     this._points[0].x, this._points[0].y, 0.0,
-            //     this._points[3].x, this._points[3].y, 0.0,
-            //     this._points[1].x, this._points[1].y, 0.0
-            // ]);
-
-            this._btn && this._btn.setAttribute("style", `height: ${this._width * 26}px; width: ${this._height * 26}px; position: absolute; top: 0; left: 0; transform: translateX(${ (this._position.x*29+370)}px) translateY(${_scene._canvas.height - (this._position.y*29+455)}px) rotateZ(${-this._rotation +90}deg)`);
+            const MeshQuad = new Float32Array([ 
+                this._points[2].x, this._points[2].y, 0.0,
+                this._points[3].x, this._points[3].y, 0.0,
+                this._points[0].x, this._points[0].y, 0.0,
+                this._points[0].x, this._points[0].y, 0.0,
+                this._points[3].x, this._points[3].y, 0.0,
+                this._points[1].x, this._points[1].y, 0.0
+            ]);
     
-            // const quad_vertex_buffer = _scene._context.createBuffer();
-            // _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, quad_vertex_buffer);
-            // _scene._context.bufferData(_scene._context.ARRAY_BUFFER, MeshQuad, _scene._context.STATIC_DRAW);
-            // _scene._context.vertexAttribPointer(vertexPositionAttribute, 3, _scene._context.FLOAT, false, 0, 0);
-            // _scene._context.enableVertexAttribArray(vertexPositionAttribute);
-            // _scene._context.drawArrays(_scene._context.TRIANGLES, 0, 6);
-            // _scene._context.uniformMatrix4fv(Pmatrix, false, _scene._proj_matrix);
-            // _scene._context.uniformMatrix4fv(Vmatrix, false, _scene._view_matrix);
-            // _scene._context.uniformMatrix4fv(Mmatrix, false, this._matrix_cascaded);			
+            const quad_vertex_buffer = _scene._context.createBuffer();
+            _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, quad_vertex_buffer);
+            _scene._context.bufferData(_scene._context.ARRAY_BUFFER, MeshQuad, _scene._context.STATIC_DRAW);
+            _scene._context.vertexAttribPointer(vertexPositionAttribute, 3, _scene._context.FLOAT, false, 0, 0);
+            _scene._context.enableVertexAttribArray(vertexPositionAttribute);
+            _scene._context.drawArrays(_scene._context.TRIANGLES, 0, 6);
+            _scene._context.uniformMatrix4fv(Pmatrix, false, _scene._proj_matrix);
+            _scene._context.uniformMatrix4fv(Vmatrix, false, _scene._view_matrix);
+            _scene._context.uniformMatrix4fv(Mmatrix, false, this._matrix_cascaded);			
         }
     };
 

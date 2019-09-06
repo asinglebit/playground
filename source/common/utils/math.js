@@ -119,3 +119,17 @@ export function get_cubic_function_extremas_for(point_start, point_control_a, po
     t2 >= 0 && t2 <= 1 && extremas.push(t2);
     return extremas;
 };
+
+/**
+ * Calculate the projection matrix
+ */
+
+export function get_projection(_angle, a, min, max) {
+    const angle = Math.tan((_angle * 0.5) * Math.PI / 180);
+    return [
+       0.5 / angle, 0 , 0, 0,
+       0, 0.5 * a / angle, 0, 0,
+       0, 0, - (max + min) / (max - min), -1,
+       0, 0, (-2 * max * min) / (max - min), 0 
+    ];
+ }
