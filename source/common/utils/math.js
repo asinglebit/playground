@@ -135,6 +135,14 @@ export function get_projection_matrix(_angle, a, min, max) {
 }
 
 /**
+ * Calculate the pixel dimensions
+ */
+
+export function get_pixel_size(width, fov) {
+    return width / (1.025 * Math.tan(fov));
+}
+
+/**
  * Calculate the view matrix
  */
 
@@ -143,7 +151,7 @@ export function get_view_matrix(width, fov) {
         1, 0, 0, 0,
         0, 1, 0, 0,
         0, 0, 1, 0,
-        0, 0, -width / (1.025 * Math.tan(fov)) ,1
+        0, 0, -get_pixel_size(width, fov), 1
     ];
 }
 
