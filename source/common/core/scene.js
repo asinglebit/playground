@@ -116,6 +116,15 @@ export function Scene(container, name, width, height) {
     this._context.depthFunc(this._context.LEQUAL);
 
     /**
+     * Viewport
+     */
+
+    this._viewport = {
+        width: 0,
+        height: 0
+    }
+
+    /**
      * User defined callback
      */
 
@@ -157,19 +166,21 @@ Scene.prototype.resize = function(width, height) {
     } else {
         this._canvas.style.width = '100%';
         this._canvas.style.height = '100%';
-        this._canvas.width = this._canvas.offsetWidth;
-        this._canvas.height = this._canvas.offsetHeight;
+        this._canvas.width = window.outerWidth;
+        this._canvas.height = window.outerHeight;
+        this._viewport.width = this._canvas.offsetWidth;
+        this._viewport.height = this._canvas.offsetHeight;
     }
 
     /**
      * Resize WebGL context and render immediately, to fight the possible flicker
      */
 
-    this._context.viewport(0.0, 0.0, this._canvas.width, this._canvas.height);
-    this._proj_matrix = get_projection_matrix(this._fov, this._canvas.width / this._canvas.height, this._near_clip_plane, this._far_clip_plane);
-    this._view_matrix = get_view_matrix(this._canvas.width, this._fov);
+    this._context.viewport(0.0, 0.0, window.outerWidth,window.outerHeight);
+    this._proj_matrix = get_projection_matrix(this._fov, this._viewport.width / this._viewport.height, this._near_clip_plane, this._far_clip_plane);
+    this._view_matrix = get_view_matrix(this._viewport.width, this._fov);
     this.render();
-    this._on_resize && this._on_resize(this._canvas.width, this._canvas.height);
+    this._on_resize && this._on_resize(this._viewport.width, this._viewport.height);
     this.render();
 
     /**
@@ -310,7 +321,7 @@ Scene.prototype.start = function(user_logic) {
      * Resizing the scene
      */
 
-    this.resize(this._canvas.width, this._canvas.height);
+    this.resize();
 
     /**
      * Start the rendering process

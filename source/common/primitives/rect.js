@@ -276,7 +276,7 @@ export function Rect(_scene, Primitive) {
             _scene._context.uniformMatrix4fv(Pmatrix, false, _scene._proj_matrix);
             _scene._context.uniformMatrix4fv(Vmatrix, false, _scene._view_matrix);
             _scene._context.uniformMatrix4fv(Mmatrix, false, this._matrix_cascaded);
-            _scene._context.uniform2f(resolutionUniformLocation, _scene._canvas.width,  _scene._canvas.height);	
+            _scene._context.uniform2f(resolutionUniformLocation, _scene._viewport.width, _scene._viewport.height);	
             _scene._context.uniform2f(dimensionsUniformLocation, this._width, this._height);	
         }
     };
