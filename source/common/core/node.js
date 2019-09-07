@@ -40,7 +40,9 @@ export function Node(_scene) {
          * Current nodes rotation in degrees
          */
 
-        this._rotation = 0;
+        Object.defineProperty(this, 'rotation', {
+            set: this.rotate
+        });
 
         /**
          * Current nodes scale

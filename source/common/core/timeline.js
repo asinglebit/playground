@@ -217,6 +217,7 @@ Timeline.prototype.seek = function (time) {
                     }
                 }
 
+
                 /**
                  * Get the object reference
                  */
@@ -324,7 +325,8 @@ Timeline.prototype.seek = function (time) {
 
     weighted_objects.map(weighted_objekt => {
         weighted_objekt.properties.map(property => {
-            weighted_objekt.reference[property.last_property] = property.value / total_weight;
+            weighted_objekt.reference[property.last_property] = !property.value ? 0 : property.value / total_weight;
+            debugger;
         });
     });
 

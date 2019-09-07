@@ -48,6 +48,8 @@ export const init = container => {
             rect_rotation(Easings.ELASTIC, Easings.ELASTIC, 10000, 1000)
         );
 
+    console.log(clip)
+
     scene
         .timeline()
         .clip(clip);
