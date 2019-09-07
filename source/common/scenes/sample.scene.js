@@ -74,6 +74,7 @@ export const init = container => {
         )
         .scene()
         .on_resize((width, height) => {
+            debugger;
             rect_background
                 .at(width / 2, height/2)
                 .width(width)

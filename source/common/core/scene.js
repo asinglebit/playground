@@ -116,12 +116,6 @@ export function Scene(container, name, width, height) {
     this._context.depthFunc(this._context.LEQUAL);
 
     /**
-     * Resizing the scene
-     */
-
-    this.resize(width, height);
-
-    /**
      * User defined callback
      */
 
@@ -175,15 +169,12 @@ Scene.prototype.resize = function(width, height) {
     this._proj_matrix = get_projection_matrix(this._fov, this._canvas.width / this._canvas.height, this._near_clip_plane, this._far_clip_plane);
     this._view_matrix = get_view_matrix(this._canvas.width, this._fov);
     this.render();
+    this._on_resize && this._on_resize(this._canvas.width, this._canvas.height);
+    this.render();
 
     /**
      * Apply external logic
      */
-
-    if (this._on_resize) {
-        this._on_resize(this._canvas.width, this._canvas.height);
-        this.render();
-    }
 
     return this;
 };
@@ -314,6 +305,17 @@ Scene.prototype.loop = function() {
  */
 
 Scene.prototype.start = function(user_logic) {
+
+    /**
+     * Resizing the scene
+     */
+
+    this.resize(this._canvas.width, this._canvas.height);
+
+    /**
+     * Start the rendering process
+     */
+
     this.timer().reset();
     this._user_logic = user_logic;
     this._request_animation_frame_id = requestAnimationFrame(() => this.loop.bind(this)());

@@ -249,6 +249,7 @@ export function Rect(_scene, Primitive) {
             const textureCoord = _scene._context.getAttribLocation(this._shader_program, 'aTextureCoord');
             const uSampler = _scene._context.getUniformLocation(this._shader_program, 'uSampler');
             const resolutionUniformLocation = _scene._context.getUniformLocation(this._shader_program, "u_resolution");
+            const dimensionsUniformLocation = _scene._context.getUniformLocation(this._shader_program, "u_dimensions");
 
             _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, textureCoordBuffer);
             _scene._context.vertexAttribPointer(textureCoord, 2, _scene._context.FLOAT, false, 0, 0);
@@ -275,7 +276,8 @@ export function Rect(_scene, Primitive) {
             _scene._context.uniformMatrix4fv(Pmatrix, false, _scene._proj_matrix);
             _scene._context.uniformMatrix4fv(Vmatrix, false, _scene._view_matrix);
             _scene._context.uniformMatrix4fv(Mmatrix, false, this._matrix_cascaded);
-            _scene._context.uniform2f(resolutionUniformLocation, _scene._canvas.width, _scene._canvas.height);		
+            _scene._context.uniform2f(resolutionUniformLocation, _scene._canvas.width,  _scene._canvas.height);	
+            _scene._context.uniform2f(dimensionsUniformLocation, this._width, this._height);	
         }
     };
 
