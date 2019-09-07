@@ -136,25 +136,13 @@ Scene.prototype.resize = function(width, height) {
     }
 
     /**
-     * Resize WebGL context
+     * Resize WebGL context and render immediately, to fight the possible flicker
      */
 
     this._context.viewport(0.0, 0.0, this._canvas.width, this._canvas.height)
     this._proj_matrix = get_projection(40, this._canvas.width / this._canvas.height, 1, 100);
-    this._proj_matrix = get_projection(40, this._canvas.width / this._canvas.height, 1, 100);
     this._view_matrix = [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,-20,1];
-
-    /**
-     * Resize the root node of the tree
-     */
-
-    const scale = this._root.scale();
-    const rotate = this._root.rotate();
-    this._root
-        .reset()
-        .translate(0, 0)
-        .scale(scale.x, scale.y)
-        .rotate(rotate);
+    this.render();
 
     return this;
 };

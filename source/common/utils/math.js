@@ -132,4 +132,12 @@ export function get_projection(_angle, a, min, max) {
        0, 0, - (max + min) / (max - min), -1,
        0, 0, (-2 * max * min) / (max - min), 0 
     ];
- }
+}
+
+/**
+ * Check if a value is of a power of 2
+ */
+
+export function is_power_of_two(value) {
+   return (value & (value - 1)) === 0;
+}
