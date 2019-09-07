@@ -31,7 +31,8 @@ import {
  * ]
  */
 
-export function Timeline() {
+export function Timeline(_scene) {
+    this._scene = _scene;
     this._time_difference = new Date().getTime();
     this._time = 0;
     this._layers = [];
@@ -61,6 +62,14 @@ export function Timeline() {
      */
 
     document.addEventListener('visibilitychange', this.onVisibilityChange);
+}
+
+/**
+ * Get the scene
+ */
+
+Timeline.prototype.scene = function() {
+    return this._scene;
 }
 
 /**

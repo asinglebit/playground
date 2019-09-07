@@ -1,6 +1,6 @@
 import {
     inherit
-} from "common/utils/helper";
+} from 'common/utils/helper';
 
 /**
  * Primitive

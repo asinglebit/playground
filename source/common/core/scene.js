@@ -1,24 +1,24 @@
 import {
     Node
-} from "common/core/node";
+} from 'common/core/node';
 import {
     DepthBuffer
-} from "common/core/depth_buffer";
+} from 'common/core/depth_buffer';
 import {
     Primitive
-} from "common/core/primitive";
+} from 'common/core/primitive';
 import {
     Rect
-} from "common/primitives/rect";
+} from 'common/primitives/rect';
 import {
     Timeline
-} from "./timeline";
+} from './timeline';
 import {
     Timer
-} from "./timer";
+} from './timer';
 import {
     get_projection
-} from "common/utils/math";
+} from 'common/utils/math';
 
 /**
  * Scene constructor
@@ -53,8 +53,11 @@ export function Scene(container, name, width, height) {
     /**
      * Constructor factory
      */
-
-    this._factory = null;
+    
+    this.factory = {};
+    this.factory.Node = Node(this);
+    this.factory.Primitive = Primitive(this, this.factory.Node);
+    this.factory.Rect = Rect(this, this.factory.Primitive),
 
     /**
      * Depth buffer that contains all renderable assets sorted by depth
@@ -66,19 +69,19 @@ export function Scene(container, name, width, height) {
      * Timeline that contains all of the keyframes related to current scene
      */
 
-    this._timeline = new Timeline();
+    this._timeline = new Timeline(this);
 
     /**
      * Root node of the scene
      */
 
-    this._root = new(this.factory()).Node();
+    this._root = new this.factory.Node();
 
     /**
      * Canvas, bound to the scene
      */
 
-    this._canvas = container.appendChild(document.createElement("canvas"));
+    this._canvas = container.appendChild(document.createElement('canvas'));
     this._canvas.id = this._name;
 
     /**
@@ -100,6 +103,14 @@ export function Scene(container, name, width, height) {
      */
 
     this._user_logic;
+
+    /**
+     * Add automatic resizing
+     */
+    
+    window.addEventListener('resize', () => {
+        this.resize();
+    });
 };
 
 /**
@@ -215,26 +226,6 @@ Scene.prototype.context = function() {
 
 Scene.prototype.depthbuffer = function() {
     return this._depthbuffer;
-};
-
-/**
- * Get the constructor factory
- */
-
-Scene.prototype.factory = function() {
-    this._factory = this._factory || function(scene) {
-        const _Node = Node(scene);
-        const _Primitive = Primitive(scene, _Node);
-        const _Rect = Rect(scene, _Primitive);
-
-        return {
-            Node: _Node,
-            Primitive: _Primitive,
-            Rect: _Rect
-        };
-    }(this);
-
-    return this._factory;
 };
 
 /**

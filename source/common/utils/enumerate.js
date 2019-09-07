@@ -2,7 +2,7 @@
  * Libraries
  */
 
-import * as R from "ramda";
+import * as R from 'ramda';
 
 /**
  * Create enumeration that starts from 1

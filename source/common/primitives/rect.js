@@ -1,28 +1,25 @@
 import {
-    vec2,
-    vec3,
-    mat4,
-    quat
+    vec2
 } from 'gl-matrix';
 import {
     BBox
 } from 'common/core/bbox';
 import {
     inherit
-} from "common/utils/helper";
+} from 'common/utils/helper';
 import {
     deg_to_rad
-} from "common/utils/math";
+} from 'common/utils/math';
 
 /**
  * Shaders
  */
 
-//import CubeVertexShader from "common/shaders/cube.vertex.glsl";
-//import CubeFragmentShader from "common/shaders/cube.fragment.glsl";
-//import CubeFragmentShader from "common/shaders/full_screen_quad.fragment.glsl";
-import CubeVertexShader from "common/shaders/texture.vertex.glsl";
-import CubeFragmentShader from "common/shaders/texture.fragment.glsl";
+//import CubeVertexShader from 'common/shaders/cube.vertex.glsl';
+//import CubeFragmentShader from 'common/shaders/cube.fragment.glsl';
+//import CubeFragmentShader from 'common/shaders/full_screen_quad.fragment.glsl';
+import CubeVertexShader from 'common/shaders/texture.vertex.glsl';
+import CubeFragmentShader from 'common/shaders/texture.fragment.glsl';
 
 //
 // Initialize a texture and load an image.
@@ -82,7 +79,7 @@ function loadTexture(gl, url) {
  * Assets
  */
 
-import ImageButton from "common/textures/button.png";
+import ImageButton from 'common/textures/tileset.png';
 
 export function Rect(_scene, Primitive) {
 
@@ -266,19 +263,20 @@ export function Rect(_scene, Primitive) {
 
             _scene._context.useProgram(this._shader_program);
             
-            const vertexPositionAttribute = _scene._context.getAttribLocation(this._shader_program, "position");
-            var Pmatrix = _scene._context.getUniformLocation(this._shader_program, "Pmatrix");
-            var Vmatrix = _scene._context.getUniformLocation(this._shader_program, "Vmatrix");
-            var Mmatrix = _scene._context.getUniformLocation(this._shader_program, "Mmatrix");
+            const vertexPositionAttribute = _scene._context.getAttribLocation(this._shader_program, 'position');
+            var Pmatrix = _scene._context.getUniformLocation(this._shader_program, 'Pmatrix');
+            var Vmatrix = _scene._context.getUniformLocation(this._shader_program, 'Vmatrix');
+            var Mmatrix = _scene._context.getUniformLocation(this._shader_program, 'Mmatrix');
 
             const textureCoordBuffer = _scene._context.createBuffer();
             _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, textureCoordBuffer);
+            const ratio = this._width / this._height;
             const textureCoordinates = [
-                1.0,  1.0,
+                1.0,  ratio,
                 1.0,  0.0,
-                0.0,  1.0,
+                0.0,  ratio,
                 
-                0.0,  1.0,
+                0.0,  ratio,
                 1.0,  0.0,
                 0.0,  0.0,
             ]

@@ -10,6 +10,10 @@ import {
     trim_angle
 } from 'common/utils/math';
 
+/**
+ * Node constructor
+ */
+
 export function Node(_scene) {
 
     /**
@@ -113,6 +117,14 @@ export function Node(_scene) {
             set: y => this.translate(undefined, y)
         });
     };
+
+    /**
+     * Get the scene
+     */
+
+    Node.prototype.scene = function() {
+        return _scene;
+    }
 
     /**
      * Get or set the position of the node
