@@ -1,3 +1,7 @@
+/**
+ * Constructors
+ */
+
 import {
     Node
 } from 'common/core/node';
@@ -16,8 +20,14 @@ import {
 import {
     Timer
 } from './timer';
+
+/**
+ * Utilities
+ */
+
 import {
-    get_projection
+    get_projection_matrix,
+    get_view_matrix
 } from 'common/utils/math';
 
 /**
@@ -37,6 +47,19 @@ export function Scene(container, name, width, height) {
      */
 
     this._fps = 60;
+
+    /**
+     * Field of view
+     */
+
+    this._fov = 45;
+
+    /**
+     * Clipping planes
+     */
+
+    this._near_clip_plane = 0;
+    this._far_clip_plane = 1000;
 
     /**
      * Request animation frame id
@@ -114,6 +137,15 @@ export function Scene(container, name, width, height) {
 };
 
 /**
+ * Custom resize logic
+ */
+
+Scene.prototype.on_resize = function(_on_resize) {
+    this._on_resize = _on_resize;
+    return this;
+}
+
+/**
  * Resize the scene
  */
 
@@ -139,10 +171,19 @@ Scene.prototype.resize = function(width, height) {
      * Resize WebGL context and render immediately, to fight the possible flicker
      */
 
-    this._context.viewport(0.0, 0.0, this._canvas.width, this._canvas.height)
-    this._proj_matrix = get_projection(40, this._canvas.width / this._canvas.height, 1, 100);
-    this._view_matrix = [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,-20,1];
+    this._context.viewport(0.0, 0.0, this._canvas.width, this._canvas.height);
+    this._proj_matrix = get_projection_matrix(this._fov, this._canvas.width / this._canvas.height, this._near_clip_plane, this._far_clip_plane);
+    this._view_matrix = get_view_matrix(this._canvas.width, this._fov);
     this.render();
+
+    /**
+     * Apply external logic
+     */
+
+    if (this._on_resize) {
+        this._on_resize(this._canvas.width, this._canvas.height);
+        this.render();
+    }
 
     return this;
 };

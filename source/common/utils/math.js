@@ -124,13 +124,26 @@ export function get_cubic_function_extremas_for(point_start, point_control_a, po
  * Calculate the projection matrix
  */
 
-export function get_projection(_angle, a, min, max) {
+export function get_projection_matrix(_angle, a, min, max) {
     const angle = Math.tan((_angle * 0.5) * Math.PI / 180);
     return [
        0.5 / angle, 0 , 0, 0,
        0, 0.5 * a / angle, 0, 0,
        0, 0, - (max + min) / (max - min), -1,
        0, 0, (-2 * max * min) / (max - min), 0 
+    ];
+}
+
+/**
+ * Calculate the view matrix
+ */
+
+export function get_view_matrix(width, fov) {
+    return [
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        0, 0, -width / (1.025 * Math.tan(fov)) ,1
     ];
 }
 
