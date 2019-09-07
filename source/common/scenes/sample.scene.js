@@ -1,17 +1,19 @@
-import {
-    Manager
-} from 'common/core/manager';
-
 /**
  * Constructors
  */
 
+import {
+    Manager
+} from 'common/core/manager';
 import {
     Clip
 } from 'common/core/clip';
 import {
     Keyframe
 } from 'common/core/keyframe';
+import {
+    deg_to_rad
+} from 'common/utils/math';
 
 /**
  * Enumerations
@@ -40,15 +42,19 @@ export const init = container => {
     root
         .append(rect)
 
-    const rect_rotation = Keyframe('rotation');
     const clip = new Clip()
         .set(
             rect,
-            rect_rotation(Easings.ELASTIC, Easings.ELASTIC, 0, 0),
-            rect_rotation(Easings.ELASTIC, Easings.ELASTIC, 10000, 1000)
+            Keyframe('position_y')(Easings.LINEAR, Easings.LINEAR, 0, 0.5),
+            Keyframe('scale_x')(Easings.ELASTIC, Easings.ELASTIC, 0, 1),
+            Keyframe('scale_y')(Easings.ELASTIC, Easings.ELASTIC, 0, 1),
+            Keyframe('rotation')(Easings.ELASTIC, Easings.ELASTIC, 0, 90),
+            Keyframe('position_y')(Easings.LINEAR, Easings.ELASTIC, 2500, 0.5),            
+            Keyframe('position_y')(Easings.ELASTIC, Easings.ELASTIC, 4000, 0),
+            Keyframe('scale_x')(Easings.ELASTIC, Easings.ELASTIC, 4000, 2),
+            Keyframe('scale_y')(Easings.ELASTIC, Easings.ELASTIC, 4000, 2),
+            Keyframe('rotation')(Easings.ELASTIC, Easings.ELASTIC, 4000, -270),
         );
-
-    console.log(clip)
 
     scene
         .timeline()

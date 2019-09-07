@@ -40,9 +40,7 @@ export function Node(_scene) {
          * Current nodes rotation in degrees
          */
 
-        Object.defineProperty(this, 'rotation', {
-            set: this.rotate
-        });
+        this._rotation = 0;
 
         /**
          * Current nodes scale
@@ -90,6 +88,30 @@ export function Node(_scene) {
          */
 
         this._dirty = false;
+
+        /**
+         * Setters
+         */
+
+        Object.defineProperty(this, 'rotation', {
+            set: this.rotate
+        });
+
+        Object.defineProperty(this, 'scale_x', {
+            set: x => this.scale(x, undefined)
+        });
+
+        Object.defineProperty(this, 'scale_y', {
+            set: y => this.scale(undefined, y)
+        });
+
+        Object.defineProperty(this, 'position_x', {
+            set: x => this.translate(x, undefined)
+        });
+
+        Object.defineProperty(this, 'position_y', {
+            set: y => this.translate(undefined, y)
+        });
     };
 
     /**
