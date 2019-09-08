@@ -29,9 +29,6 @@ import {
  * Shaders
  */
 
-//import CubeVertexShader from 'common/shaders/cube.vertex.glsl';
-//import CubeFragmentShader from 'common/shaders/cube.fragment.glsl';
-//import CubeFragmentShader from 'common/shaders/full_screen_quad.fragment.glsl';
 import VertexShader from 'common/shaders/texture.vertex.glsl';
 import FragmentShader from 'common/shaders/texture.fragment.glsl';
 
@@ -92,6 +89,11 @@ export function Rect(_scene, Primitive) {
          */
 
         this._height = 0;
+
+        /**
+         * Create and compile shader
+         */
+
         this._shader_program = _scene._context.createProgram();
         const vertex_shader = _scene._context.createShader(_scene._context.VERTEX_SHADER);
         const fragment_shader = _scene._context.createShader(_scene._context.FRAGMENT_SHADER);
@@ -234,12 +236,11 @@ export function Rect(_scene, Primitive) {
 
             const textureCoordBuffer = _scene._context.createBuffer();
             _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, textureCoordBuffer);
-            const ratio = this._width / this._height;
+            
             const textureCoordinates = [
                 1.0,  1.0,
                 1.0,  0.0,
-                0.0,  1.0,
-                
+                0.0,  1.0,                
                 0.0,  1.0,
                 1.0,  0.0,
                 0.0,  0.0,

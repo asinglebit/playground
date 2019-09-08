@@ -125,6 +125,18 @@ export function Scene(container, name, width, height) {
     }
 
     /**
+     * Render target
+     */
+
+    this._render_buffer = this._context.createFramebuffer();
+    this._render_target = this._context.createTexture();
+    this._context.bindTexture(this._context.TEXTURE_2D, this._render_target);
+    this._context.texImage2D(this._context.TEXTURE_2D, 0, this._context.RGBA, 512, 512, 0, this._context.RGBA, this._context.UNSIGNED_BYTE, null);
+    this._context.texParameteri(this._context.TEXTURE_2D, this._context.TEXTURE_MIN_FILTER, this._context.LINEAR);
+    this._context.texParameteri(this._context.TEXTURE_2D, this._context.TEXTURE_WRAP_S, this._context.CLAMP_TO_EDGE);
+    this._context.texParameteri(this._context.TEXTURE_2D, this._context.TEXTURE_WRAP_T, this._context.CLAMP_TO_EDGE);
+
+    /**
      * User defined callback
      */
 
@@ -275,23 +287,42 @@ Scene.prototype.clear = function() {
 
 Scene.prototype.render = function() {
 
-    // Detect dirty nodes and cascade their transformations
+    /**
+     * Switch to frame buffer
+     */
+
+    this._context.bindFramebuffer(this._context.FRAMEBUFFER, this._render_buffer);
+    this._context.framebufferTexture2D(this._context.FRAMEBUFFER, this._context.COLOR_ATTACHMENT0, this._context.TEXTURE_2D, this._render_target, 0);
+
+    /**
+     * Detect dirty nodes and cascade their transformations
+     */
 
     const dirty = this.root().reachDirty();
     for (let i = 0; i < dirty.length; ++i) {
         dirty[i].cascade();
     }
 
-    // Clear the context
+    /**
+     * Clear the context
+     */
 
     this.clear();
 
-    // Iterate over the depth buffer and render all of the primitives
+    /**
+     * Iterate over the depth buffer and render all of the primitives
+     */
 
     const primitives = this._depthbuffer.primitives();
     for (let i = 0; i < primitives.length; ++i) {
         primitives[i].render();
     }
+
+    /**
+     * Render the content of the render target to the screen
+     */
+
+    this._context.bindFramebuffer(this._context.FRAMEBUFFER, null);
     
     return this;
 };
