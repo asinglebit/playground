@@ -22,6 +22,21 @@ import {
 } from './timer';
 
 /**
+ * Shaders
+ */
+
+import VertexShader from 'common/shaders/full_screen_quad.vertex.glsl';
+import FragmentShader from 'common/shaders/full_screen_quad.fragment.glsl';
+
+/**
+ * Meshes
+ */
+
+import {
+    MeshQuad
+} from 'common/meshes/quad';
+
+/**
  * Utilities
  */
 
@@ -130,11 +145,21 @@ export function Scene(container, name, width, height) {
 
     this._render_buffer = this._context.createFramebuffer();
     this._render_target = this._context.createTexture();
-    this._context.bindTexture(this._context.TEXTURE_2D, this._render_target);
-    this._context.texImage2D(this._context.TEXTURE_2D, 0, this._context.RGBA, 512, 512, 0, this._context.RGBA, this._context.UNSIGNED_BYTE, null);
-    this._context.texParameteri(this._context.TEXTURE_2D, this._context.TEXTURE_MIN_FILTER, this._context.LINEAR);
-    this._context.texParameteri(this._context.TEXTURE_2D, this._context.TEXTURE_WRAP_S, this._context.CLAMP_TO_EDGE);
-    this._context.texParameteri(this._context.TEXTURE_2D, this._context.TEXTURE_WRAP_T, this._context.CLAMP_TO_EDGE);
+
+    /**
+     * Screen quad rendering
+     */
+
+    this._shader_program = this._context.createProgram();
+    const vertex_shader = this._context.createShader(this._context.VERTEX_SHADER);
+    const fragment_shader = this._context.createShader(this._context.FRAGMENT_SHADER);
+    this._context.shaderSource(vertex_shader, VertexShader);
+    this._context.shaderSource(fragment_shader, FragmentShader);
+    this._context.compileShader(vertex_shader);
+    this._context.compileShader(fragment_shader);
+    this._context.attachShader(this._shader_program, vertex_shader);
+    this._context.attachShader(this._shader_program, fragment_shader);
+    this._context.linkProgram(this._shader_program);
 
     /**
      * User defined callback
@@ -293,6 +318,11 @@ Scene.prototype.render = function() {
 
     this._context.bindFramebuffer(this._context.FRAMEBUFFER, this._render_buffer);
     this._context.framebufferTexture2D(this._context.FRAMEBUFFER, this._context.COLOR_ATTACHMENT0, this._context.TEXTURE_2D, this._render_target, 0);
+    this._context.bindTexture(this._context.TEXTURE_2D, this._render_target);
+    this._context.texImage2D(this._context.TEXTURE_2D, 0, this._context.RGBA, this._canvas.width, this._canvas.height, 0, this._context.RGBA, this._context.UNSIGNED_BYTE, null);
+    this._context.texParameteri(this._context.TEXTURE_2D, this._context.TEXTURE_MIN_FILTER, this._context.LINEAR);
+    this._context.texParameteri(this._context.TEXTURE_2D, this._context.TEXTURE_WRAP_S, this._context.CLAMP_TO_EDGE);
+    this._context.texParameteri(this._context.TEXTURE_2D, this._context.TEXTURE_WRAP_T, this._context.CLAMP_TO_EDGE);
 
     /**
      * Detect dirty nodes and cascade their transformations
@@ -323,6 +353,33 @@ Scene.prototype.render = function() {
      */
 
     this._context.bindFramebuffer(this._context.FRAMEBUFFER, null);
+    this._context.useProgram(this._shader_program);
+    const vertexPositionAttribute = this._context.getAttribLocation(this._shader_program, "v_position");
+    const textureCoordBuffer = this._context.createBuffer();
+    this._context.bindBuffer(this._context.ARRAY_BUFFER, textureCoordBuffer);
+    const textureCoordinates = [
+        0.0,  0.0,
+        1.0,  0.0,
+        0.0,  1.0,                
+        0.0,  1.0,
+        1.0,  0.0,
+        1.0,  1.0,
+    ]
+    this._context.bufferData(this._context.ARRAY_BUFFER, new Float32Array(textureCoordinates), this._context.STATIC_DRAW);
+    const textureCoord = this._context.getAttribLocation(this._shader_program, 'aTextureCoord');
+    const uSampler = this._context.getUniformLocation(this._shader_program, 'uSampler');
+    this._context.bindBuffer(this._context.ARRAY_BUFFER, textureCoordBuffer);
+    this._context.vertexAttribPointer(textureCoord, 2, this._context.FLOAT, false, 0, 0);
+    this._context.enableVertexAttribArray(textureCoord);
+    this._context.activeTexture(this._context.TEXTURE0);
+    this._context.bindTexture(this._context.TEXTURE_2D, this._render_target);
+    this._context.uniform1i(uSampler, 0);
+    const quad_vertex_buffer = this._context.createBuffer();
+    this._context.bindBuffer(this._context.ARRAY_BUFFER, quad_vertex_buffer);
+    this._context.bufferData(this._context.ARRAY_BUFFER, MeshQuad, this._context.STATIC_DRAW);
+    this._context.vertexAttribPointer(vertexPositionAttribute, 3, this._context.FLOAT, false, 0, 0);
+    this._context.enableVertexAttribArray(vertexPositionAttribute);
+    this._context.drawArrays(this._context.TRIANGLES, 0, 6);
     
     return this;
 };

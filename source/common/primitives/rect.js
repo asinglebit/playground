@@ -227,16 +227,13 @@ export function Rect(_scene, Primitive) {
              * Setup transformations and render
              */
 
-            _scene._context.useProgram(this._shader_program);
-            
+            _scene._context.useProgram(this._shader_program);            
             const vertexPositionAttribute = _scene._context.getAttribLocation(this._shader_program, 'position');
             var Pmatrix = _scene._context.getUniformLocation(this._shader_program, 'Pmatrix');
             var Vmatrix = _scene._context.getUniformLocation(this._shader_program, 'Vmatrix');
             var Mmatrix = _scene._context.getUniformLocation(this._shader_program, 'Mmatrix');
-
             const textureCoordBuffer = _scene._context.createBuffer();
-            _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, textureCoordBuffer);
-            
+            _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, textureCoordBuffer);            
             const textureCoordinates = [
                 1.0,  1.0,
                 1.0,  0.0,
@@ -246,19 +243,16 @@ export function Rect(_scene, Primitive) {
                 0.0,  0.0,
             ]
             _scene._context.bufferData(_scene._context.ARRAY_BUFFER, new Float32Array(textureCoordinates), _scene._context.STATIC_DRAW);
-
             const textureCoord = _scene._context.getAttribLocation(this._shader_program, 'aTextureCoord');
             const uSampler = _scene._context.getUniformLocation(this._shader_program, 'uSampler');
             const resolutionUniformLocation = _scene._context.getUniformLocation(this._shader_program, "u_resolution");
             const dimensionsUniformLocation = _scene._context.getUniformLocation(this._shader_program, "u_dimensions");
-
             _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, textureCoordBuffer);
             _scene._context.vertexAttribPointer(textureCoord, 2, _scene._context.FLOAT, false, 0, 0);
             _scene._context.enableVertexAttribArray(textureCoord);
             _scene._context.activeTexture(_scene._context.TEXTURE0);
             _scene._context.bindTexture(_scene._context.TEXTURE_2D, this._texture);
             _scene._context.uniform1i(uSampler, 0);
-
             const MeshQuad = new Float32Array([ 
                 this._points[3].x, this._points[3].y, 0.0,
                 this._points[1].x, this._points[1].y, 0.0,
@@ -266,8 +260,7 @@ export function Rect(_scene, Primitive) {
                 this._points[2].x, this._points[2].y, 0.0,
                 this._points[1].x, this._points[1].y, 0.0,
                 this._points[0].x, this._points[0].y, 0.0
-            ]);
-    
+            ]);    
             const quad_vertex_buffer = _scene._context.createBuffer();
             _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, quad_vertex_buffer);
             _scene._context.bufferData(_scene._context.ARRAY_BUFFER, MeshQuad, _scene._context.STATIC_DRAW);
