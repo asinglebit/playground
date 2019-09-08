@@ -254,12 +254,12 @@ export function Rect(_scene, Primitive) {
             _scene._context.bindTexture(_scene._context.TEXTURE_2D, this._texture);
             _scene._context.uniform1i(uSampler, 0);
             const MeshQuad = new Float32Array([ 
-                this._points[3].x, this._points[3].y, 0.0,
-                this._points[1].x, this._points[1].y, 0.0,
-                this._points[2].x, this._points[2].y, 0.0,
-                this._points[2].x, this._points[2].y, 0.0,
-                this._points[1].x, this._points[1].y, 0.0,
-                this._points[0].x, this._points[0].y, 0.0
+                this._points[3].x, this._points[3].y, this._depth / 5,
+                this._points[1].x, this._points[1].y, this._depth / 5,
+                this._points[2].x, this._points[2].y, this._depth / 5,
+                this._points[2].x, this._points[2].y, this._depth / 5,
+                this._points[1].x, this._points[1].y, this._depth / 5,
+                this._points[0].x, this._points[0].y, this._depth / 5
             ]);    
             const quad_vertex_buffer = _scene._context.createBuffer();
             _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, quad_vertex_buffer);

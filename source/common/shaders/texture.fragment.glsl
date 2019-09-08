@@ -1,6 +1,7 @@
 precision highp float;
 
 varying highp vec2 vTextureCoord;
+varying highp vec3 vPosition;
 
 uniform sampler2D uSampler;
 uniform vec2 u_dimensions;
@@ -19,8 +20,10 @@ void main(void) {
       && clipSpace.y < maxY
       && clipSpace.y > minY
    ) {
-     gl_FragColor = texture2D(uSampler, vTextureCoord);
-   } else {
-     gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-   }
+      //gl_FragColor = texture2D(uSampler, vTextureCoord);
+      gl_FragColor = vec4(vPosition.z, vPosition.z, vPosition.z, 1.0);
+      //gl_FragColor = vec4(texture2D(uSampler, vTextureCoord).rgb / 2.0, 1.0) + vec4(vPosition.z, vPosition.z, vPosition.z, 0.0);
+    } else {
+      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+  }
 }

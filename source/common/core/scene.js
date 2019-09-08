@@ -368,6 +368,7 @@ Scene.prototype.render = function() {
     this._context.bufferData(this._context.ARRAY_BUFFER, new Float32Array(textureCoordinates), this._context.STATIC_DRAW);
     const textureCoord = this._context.getAttribLocation(this._shader_program, 'aTextureCoord');
     const uSampler = this._context.getUniformLocation(this._shader_program, 'uSampler');
+    const resolutionUniformLocation = this._context.getUniformLocation(this._shader_program, "u_resolution");
     this._context.bindBuffer(this._context.ARRAY_BUFFER, textureCoordBuffer);
     this._context.vertexAttribPointer(textureCoord, 2, this._context.FLOAT, false, 0, 0);
     this._context.enableVertexAttribArray(textureCoord);
@@ -379,6 +380,7 @@ Scene.prototype.render = function() {
     this._context.bufferData(this._context.ARRAY_BUFFER, MeshQuad, this._context.STATIC_DRAW);
     this._context.vertexAttribPointer(vertexPositionAttribute, 3, this._context.FLOAT, false, 0, 0);
     this._context.enableVertexAttribArray(vertexPositionAttribute);
+    this._context.uniform2f(resolutionUniformLocation, this._viewport.width, this._viewport.height);	
     this._context.drawArrays(this._context.TRIANGLES, 0, 6);
     
     return this;

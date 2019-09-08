@@ -48,34 +48,34 @@ export const init = container => {
             .append(rect_header)
             .append(rect_content)
         )
-        // .scene()
-        // .timeline()
-        // .clip(
-        //     new Clip()
-        //     .set(
-        //         rect_background,
-        //         Keyframe('position_y')(Easings.LINEAR, Easings.LINEAR, 0, 0.5),
-        //         Keyframe('scale_x')(Easings.CUBIC, Easings.CUBIC, 0, 0.1),
-        //         Keyframe('scale_y')(Easings.CUBIC, Easings.CUBIC, 0, 0.1),
-        //         Keyframe('rotation')(Easings.CUBIC, Easings.CUBIC, 0, 0),
-        //         Keyframe('position_y')(Easings.LINEAR, Easings.CUBIC, 2500, 0.5),            
-        //         Keyframe('position_y')(Easings.CUBIC, Easings.CUBIC, 4000, 0),
-        //         Keyframe('scale_x')(Easings.CUBIC, Easings.CUBIC, 4000, 1),
-        //         Keyframe('scale_y')(Easings.CUBIC, Easings.CUBIC, 4000, 1),
-        //     )
-        //     .set(
-        //         rect_content,
-        //         Keyframe('position_y')(Easings.LINEAR, Easings.LINEAR, 0, 0.5),
-        //         Keyframe('scale_x')(Easings.ELASTIC, Easings.ELASTIC, 0, 0.1),
-        //         Keyframe('scale_y')(Easings.ELASTIC, Easings.ELASTIC, 0, 0.1),
-        //         Keyframe('rotation')(Easings.ELASTIC, Easings.ELASTIC, 0, 0),
-        //         Keyframe('position_y')(Easings.LINEAR, Easings.ELASTIC, 2500, 0.5),            
-        //         Keyframe('position_y')(Easings.ELASTIC, Easings.ELASTIC, 4000, 0),
-        //         Keyframe('scale_x')(Easings.ELASTIC, Easings.ELASTIC, 4000, 1),
-        //         Keyframe('scale_y')(Easings.ELASTIC, Easings.ELASTIC, 4000, 1),
-        //         Keyframe('rotation')(Easings.ELASTIC, Easings.ELASTIC, 4000, 360),
-        //     )
-        // )
+        .scene()
+        .timeline()
+        .clip(
+            new Clip()
+            .set(
+                rect_background,
+                Keyframe('position_y')(Easings.LINEAR, Easings.LINEAR, 0, 0.5),
+                Keyframe('scale_x')(Easings.CUBIC, Easings.CUBIC, 0, 0.1),
+                Keyframe('scale_y')(Easings.CUBIC, Easings.CUBIC, 0, 0.1),
+                Keyframe('rotation')(Easings.CUBIC, Easings.CUBIC, 0, 0),
+                Keyframe('position_y')(Easings.LINEAR, Easings.CUBIC, 2500, 0.5),            
+                Keyframe('position_y')(Easings.CUBIC, Easings.CUBIC, 4000, 0),
+                Keyframe('scale_x')(Easings.CUBIC, Easings.CUBIC, 4000, 1),
+                Keyframe('scale_y')(Easings.CUBIC, Easings.CUBIC, 4000, 1),
+            )
+            .set(
+                rect_content,
+                Keyframe('position_y')(Easings.LINEAR, Easings.LINEAR, 0, 0.5),
+                Keyframe('scale_x')(Easings.ELASTIC, Easings.ELASTIC, 0, 0.1),
+                Keyframe('scale_y')(Easings.ELASTIC, Easings.ELASTIC, 0, 0.1),
+                Keyframe('rotation')(Easings.ELASTIC, Easings.ELASTIC, 0, 0),
+                Keyframe('position_y')(Easings.LINEAR, Easings.ELASTIC, 2500, 0.5),            
+                Keyframe('position_y')(Easings.ELASTIC, Easings.ELASTIC, 4000, 0),
+                Keyframe('scale_x')(Easings.ELASTIC, Easings.ELASTIC, 4000, 1),
+                Keyframe('scale_y')(Easings.ELASTIC, Easings.ELASTIC, 4000, 1),
+                Keyframe('rotation')(Easings.ELASTIC, Easings.ELASTIC, 4000, 360),
+            )
+        )
         .scene()
         .on_resize((width, height) => {
             rect_background
