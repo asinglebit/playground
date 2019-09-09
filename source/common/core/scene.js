@@ -216,7 +216,6 @@ Scene.prototype.resize = function(width, height) {
     this._context.viewport(0.0, 0.0, window.outerWidth,window.outerHeight);
     this._proj_matrix = get_projection_matrix(this._fov, this._viewport.width / this._viewport.height, this._near_clip_plane, this._far_clip_plane);
     this._view_matrix = get_view_matrix(this._viewport.width, this._fov);
-    this.render();
     this._on_resize && this._on_resize(this._viewport.width, this._viewport.height);
     this.render();
 
