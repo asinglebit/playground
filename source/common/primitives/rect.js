@@ -33,12 +33,6 @@ import VertexShader from 'common/shaders/texture.vertex.glsl';
 import FragmentShader from 'common/shaders/texture.fragment.glsl';
 
 /**
- * Textures
- */
-
-import ImageButton from 'common/textures/tileset.png';
-
-/**
  * Rect constructor
  */
 
@@ -56,6 +50,12 @@ export function Rect(_scene, Primitive) {
 
     function Rect() {
         Primitive.call(this);
+
+        /**
+         * Scene
+         */
+
+        this._scene = _scene;
 
         /**
          * Visual representation of the _points array indices:
@@ -91,21 +91,43 @@ export function Rect(_scene, Primitive) {
         this._height = 0;
 
         /**
+         * Background
+         */
+
+        this._texture = null;
+
+        /**
          * Create and compile shader
          */
 
-        this._shader_program = _scene._context.createProgram();
-        const vertex_shader = _scene._context.createShader(_scene._context.VERTEX_SHADER);
-        const fragment_shader = _scene._context.createShader(_scene._context.FRAGMENT_SHADER);
-        _scene._context.shaderSource(vertex_shader, VertexShader);
-        _scene._context.shaderSource(fragment_shader, FragmentShader);
-        _scene._context.compileShader(vertex_shader);
-        _scene._context.compileShader(fragment_shader);
-        _scene._context.attachShader(this._shader_program, vertex_shader);
-        _scene._context.attachShader(this._shader_program, fragment_shader);
-        _scene._context.linkProgram(this._shader_program);
-        this._texture = load_texture(_scene._context, ImageButton);
+        this.compile_shader();
     };
+
+    /**
+     * Configure, setup and compile the rect shader
+     */
+
+    Rect.prototype.compile_shader = function() {
+        this._shader_program = this._scene._context.createProgram();
+        const vertex_shader = this._scene._context.createShader(this._scene._context.VERTEX_SHADER);
+        const fragment_shader = this._scene._context.createShader(this._scene._context.FRAGMENT_SHADER);
+        this._scene._context.shaderSource(vertex_shader, VertexShader);
+        this._scene._context.shaderSource(fragment_shader, FragmentShader);
+        this._scene._context.compileShader(vertex_shader);
+        this._scene._context.compileShader(fragment_shader);
+        this._scene._context.attachShader(this._shader_program, vertex_shader);
+        this._scene._context.attachShader(this._shader_program, fragment_shader);
+        this._scene._context.linkProgram(this._shader_program);
+    }
+
+    /**
+     * Set the background
+     */
+
+    Rect.prototype.background = function(url) {
+        this._texture = url && load_texture(this._scene._context, url) || null;
+        return this;
+    }
 
     /**
      * Get or set the upper left point of the rect
@@ -224,35 +246,60 @@ export function Rect(_scene, Primitive) {
         if (this._hidden === false) {
 
             /**
-             * Setup transformations and render
+             * Get locations
              */
 
-            _scene._context.useProgram(this._shader_program);            
-            const vertexPositionAttribute = _scene._context.getAttribLocation(this._shader_program, 'position');
-            var Pmatrix = _scene._context.getUniformLocation(this._shader_program, 'Pmatrix');
-            var Vmatrix = _scene._context.getUniformLocation(this._shader_program, 'Vmatrix');
-            var Mmatrix = _scene._context.getUniformLocation(this._shader_program, 'Mmatrix');
-            const textureCoordBuffer = _scene._context.createBuffer();
-            _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, textureCoordBuffer);            
-            const textureCoordinates = [
+            _scene._context.useProgram(this._shader_program);
+            const a_position = _scene._context.getAttribLocation(this._shader_program, 'a_position');
+            const a_texture_coord = _scene._context.getAttribLocation(this._shader_program, 'a_texture_coord');
+            const u_matrix_cascaded = _scene._context.getUniformLocation(this._shader_program, 'u_matrix_cascaded');
+            const u_sampler = _scene._context.getUniformLocation(this._shader_program, 'u_sampler');
+            const u_resolution = _scene._context.getUniformLocation(this._shader_program, "u_resolution");
+            const u_dimensions = _scene._context.getUniformLocation(this._shader_program, "u_dimensions");
+
+            /**
+             * Layout
+             */
+            
+            _scene._context.uniformMatrix4fv(u_matrix_cascaded, false, this._matrix_cascaded);
+            _scene._context.uniform2f(u_resolution, _scene._viewport.width, _scene._viewport.height);	
+            _scene._context.uniform2f(u_dimensions, this._width, this._height);
+
+            /**
+             * Texture coordinates
+             */
+
+            const texture_coordinates_buffer = _scene._context.createBuffer();
+            _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, texture_coordinates_buffer);            
+            const texture_coordinates = [
                 1.0,  1.0,
                 1.0,  0.0,
-                0.0,  1.0,                
+                0.0,  1.0,
                 0.0,  1.0,
                 1.0,  0.0,
                 0.0,  0.0,
             ]
-            _scene._context.bufferData(_scene._context.ARRAY_BUFFER, new Float32Array(textureCoordinates), _scene._context.STATIC_DRAW);
-            const textureCoord = _scene._context.getAttribLocation(this._shader_program, 'aTextureCoord');
-            const uSampler = _scene._context.getUniformLocation(this._shader_program, 'uSampler');
-            const resolutionUniformLocation = _scene._context.getUniformLocation(this._shader_program, "u_resolution");
-            const dimensionsUniformLocation = _scene._context.getUniformLocation(this._shader_program, "u_dimensions");
-            _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, textureCoordBuffer);
-            _scene._context.vertexAttribPointer(textureCoord, 2, _scene._context.FLOAT, false, 0, 0);
-            _scene._context.enableVertexAttribArray(textureCoord);
-            _scene._context.activeTexture(_scene._context.TEXTURE0);
-            _scene._context.bindTexture(_scene._context.TEXTURE_2D, this._texture);
-            _scene._context.uniform1i(uSampler, 0);
+            _scene._context.bufferData(_scene._context.ARRAY_BUFFER, new Float32Array(texture_coordinates), _scene._context.STATIC_DRAW);
+            _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, texture_coordinates_buffer);
+            _scene._context.vertexAttribPointer(a_texture_coord, 2, _scene._context.FLOAT, false, 0, 0);
+            _scene._context.enableVertexAttribArray(a_texture_coord);
+
+            /**
+             * Texture
+             */
+
+            if (this._texture) {
+                _scene._context.activeTexture(_scene._context.TEXTURE0);
+                _scene._context.bindTexture(_scene._context.TEXTURE_2D, this._texture);
+                _scene._context.uniform1i(u_sampler, 0);
+            } else {
+                _scene._context.bindTexture(_scene._context.TEXTURE_2D, null);
+            }
+
+            /**
+             * Mesh
+             */
+
             const MeshQuad = new Float32Array([ 
                 this._points[3].x, this._points[3].y, this._depth / 5,
                 this._points[1].x, this._points[1].y, this._depth / 5,
@@ -264,14 +311,9 @@ export function Rect(_scene, Primitive) {
             const quad_vertex_buffer = _scene._context.createBuffer();
             _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, quad_vertex_buffer);
             _scene._context.bufferData(_scene._context.ARRAY_BUFFER, MeshQuad, _scene._context.STATIC_DRAW);
-            _scene._context.vertexAttribPointer(vertexPositionAttribute, 3, _scene._context.FLOAT, false, 0, 0);
-            _scene._context.enableVertexAttribArray(vertexPositionAttribute);
+            _scene._context.vertexAttribPointer(a_position, 3, _scene._context.FLOAT, false, 0, 0);
+            _scene._context.enableVertexAttribArray(a_position);
             _scene._context.drawArrays(_scene._context.TRIANGLES, 0, 6);
-            _scene._context.uniformMatrix4fv(Pmatrix, false, _scene._proj_matrix);
-            _scene._context.uniformMatrix4fv(Vmatrix, false, _scene._view_matrix);
-            _scene._context.uniformMatrix4fv(Mmatrix, false, this._matrix_cascaded);
-            _scene._context.uniform2f(resolutionUniformLocation, _scene._viewport.width, _scene._viewport.height);	
-            _scene._context.uniform2f(dimensionsUniformLocation, this._width, this._height);	
         }
     };
 
