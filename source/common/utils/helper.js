@@ -17,19 +17,6 @@ export function inherit(child, parent) {
 };
 
 /**
- * Get a random color
- */
-
-export function random_color() {
-    return [
-        ~~(Math.random() * 256),
-        ~~(Math.random() * 256),
-        ~~(Math.random() * 256),
-        Math.random(),
-    ];
-}
-
-/**
  * Get base prototype
  */
 

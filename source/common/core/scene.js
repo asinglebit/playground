@@ -64,17 +64,12 @@ export function Scene(container, name, width, height) {
     this._fps = 60;
 
     /**
-     * Field of view
+     * Camera setup
      */
 
     this._fov = 45;
-
-    /**
-     * Clipping planes
-     */
-
     this._near_clip_plane = 0;
-    this._far_clip_plane = 1000;
+    this._far_clip_plane = 1000000;
 
     /**
      * Request animation frame id
@@ -147,6 +142,12 @@ export function Scene(container, name, width, height) {
     this._render_target = this._context.createTexture();
 
     /**
+     * Material
+     */
+
+    this._material = null;
+
+    /**
      * Screen quad rendering
      */
 
@@ -160,12 +161,6 @@ export function Scene(container, name, width, height) {
     this._context.attachShader(this._shader_program, vertex_shader);
     this._context.attachShader(this._shader_program, fragment_shader);
     this._context.linkProgram(this._shader_program);
-
-    /**
-     * User defined callback
-     */
-
-    this._user_logic;
 
     /**
      * Add automatic resizing
@@ -394,7 +389,6 @@ Scene.prototype.loop = function() {
         if (this._request_animation_frame_id) {
             this._request_animation_frame_id = requestAnimationFrame(() => this.loop.bind(this)());
             this._timeline.seek(this._timer.delta());
-            this._user_logic && this._user_logic();
             this.render();
         }
     }, 1000 / this._fps);
@@ -404,7 +398,7 @@ Scene.prototype.loop = function() {
  * Start rendering
  */
 
-Scene.prototype.start = function(user_logic) {
+Scene.prototype.start = function() {
 
     /**
      * Resizing the scene
@@ -417,7 +411,6 @@ Scene.prototype.start = function(user_logic) {
      */
 
     this.timer().reset();
-    this._user_logic = user_logic;
     this._request_animation_frame_id = requestAnimationFrame(() => this.loop.bind(this)());
 };
 

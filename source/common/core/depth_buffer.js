@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Depth buffer constructor
  */

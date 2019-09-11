@@ -21,18 +21,26 @@ import {
 } from 'common/enumerations';
 
 /**
- * Utilities
- */
-
-import {
-    get_pixel_size
-} from 'common/utils/math';
-
-/**
  * Textures
  */
 
-import ImageButton from 'common/textures/tileset.png';
+import ImageBackground from 'common/textures/tileset.png';
+
+/**
+ * Enumerations
+ */
+
+import {
+    ShadingBackground,
+    ShadingBorder
+} from 'common/enumerations';
+
+/**
+ * Utilities
+ */
+
+import * as UtilitiesColors from 'common/utils/colors';
+import * as UtilitiesMath from 'common/utils/math';
 
 /**
  * Scene
@@ -42,60 +50,48 @@ export const init = container => {
     
     const scene = new Manager()
         .new(container, 'scene');
-
-    const rect_background = new scene.factory.Rect().background(ImageButton);
-    const rect_content = new scene.factory.Rect().depth(1);
-    const rect_header = new scene.factory.Rect().depth(2);
+    const rect_background = new scene.factory.Rect()
+        .background(ShadingBackground.COLOR, UtilitiesColors.hex_to_rgba('#f3f3f3'));
+    const rect_header = new scene.factory.Rect()
+        .background(ShadingBackground.COLOR, UtilitiesColors.hex_to_rgba('#cdcdcd'));
+    const react_search_bar = new scene.factory.Rect()
+        .background(ShadingBackground.COLOR, UtilitiesColors.hex_to_rgba('#707070'));
+    const react_search_input = new scene.factory.Rect()
+        .background(ShadingBackground.COLOR, UtilitiesColors.hex_to_rgba('#ffffff'))
+        .border(ShadingBorder.SOLID, 2, UtilitiesColors.hex_to_rgba('#cdcdcd'))
+        .border_radius(5)
+        .depth(5);
 
     scene
         .root()
         .append(
             rect_background
             .append(rect_header)
-            .append(rect_content)
+            .append(
+                react_search_bar
+                .append(
+                    react_search_input
+                )
+            )
         )
-        // .scene()
-        // .timeline()
-        // .clip(
-        //     new Clip()
-        //     .set(
-        //         rect_background,
-        //         Keyframe('position_y')(Easings.LINEAR, Easings.LINEAR, 0, 0.5),
-        //         Keyframe('scale_x')(Easings.CUBIC, Easings.CUBIC, 0, 0.1),
-        //         Keyframe('scale_y')(Easings.CUBIC, Easings.CUBIC, 0, 0.1),
-        //         Keyframe('rotation')(Easings.CUBIC, Easings.CUBIC, 0, 0),
-        //         Keyframe('position_y')(Easings.LINEAR, Easings.CUBIC, 2500, 0.5),            
-        //         Keyframe('position_y')(Easings.CUBIC, Easings.CUBIC, 4000, 0),
-        //         Keyframe('scale_x')(Easings.CUBIC, Easings.CUBIC, 4000, 1),
-        //         Keyframe('scale_y')(Easings.CUBIC, Easings.CUBIC, 4000, 1),
-        //     )
-        //     .set(
-        //         rect_content,
-        //         Keyframe('position_y')(Easings.LINEAR, Easings.LINEAR, 0, 0.5),
-        //         Keyframe('scale_x')(Easings.ELASTIC, Easings.ELASTIC, 0, 0.1),
-        //         Keyframe('scale_y')(Easings.ELASTIC, Easings.ELASTIC, 0, 0.1),
-        //         Keyframe('rotation')(Easings.ELASTIC, Easings.ELASTIC, 0, 0),
-        //         Keyframe('position_y')(Easings.LINEAR, Easings.ELASTIC, 2500, 0.5),            
-        //         Keyframe('position_y')(Easings.ELASTIC, Easings.ELASTIC, 4000, 0),
-        //         Keyframe('scale_x')(Easings.ELASTIC, Easings.ELASTIC, 4000, 1),
-        //         Keyframe('scale_y')(Easings.ELASTIC, Easings.ELASTIC, 4000, 1),
-        //         Keyframe('rotation')(Easings.ELASTIC, Easings.ELASTIC, 4000, 360),
-        //     )
-        // )
         .scene()
         .on_resize((width, height) => {
             rect_background
                 .at(width / 2, height / 2)
                 .width(width)
                 .height(height);
-            rect_content
-                .at(width / 2, 1500)
-                .width(Math.min(1200, width))
-                .height(3000);
             rect_header
-                .at(width / 2, Math.min(250, height) / 2)
+                .at(width / 2, 250 / 2)
                 .width(width)
-                .height(Math.min(250, height));
+                .height(250);
+            react_search_bar
+                .at(width / 2, 150 / 2 + 200)
+                .width(width)
+                .height(150)
+            react_search_input
+                .at(width - 120, 60 / 2 + 270)
+                .width(200)
+                .height(50)
         })
         .resize()
         .start();
@@ -103,11 +99,11 @@ export const init = container => {
         let scroll = 0;
         document.addEventListener('wheel', function(event) {
             if (event.deltaY > 0) {
-                scroll += 0.1;
+                scroll = scroll - 0.08;
             } else {
-                scroll -= 0.1;
+                scroll = scroll + 0.08;
             }
-
-            rect_content.position_y = scroll;
+            rect_header.position_y = scroll;
+            react_search_bar.position_y = scroll;
         });
 }

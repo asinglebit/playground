@@ -2,4 +2,5 @@
  * Exports
  */
 
-export * from './easings.enumeration';
+export * from './misc';
+export * from './shading';

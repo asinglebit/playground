@@ -13,9 +13,17 @@ import {
 import {
     inherit
 } from 'common/utils/helper';
+import * as UtilitiesColors from 'common/utils/colors';
+import * as UtilitiesWebGL from 'common/utils/webgl';
+
+/**
+ * Enumerations
+ */
+
 import {
-    load_texture
-} from 'common/utils/webgl';
+    ShadingBackground,
+    ShadingBorder
+} from 'common/enumerations';
 
 /**
  * Constructors
@@ -50,12 +58,6 @@ export function Rect(_scene, Primitive) {
 
     function Rect() {
         Primitive.call(this);
-
-        /**
-         * Scene
-         */
-
-        this._scene = _scene;
 
         /**
          * Visual representation of the _points array indices:
@@ -97,6 +99,31 @@ export function Rect(_scene, Primitive) {
         this._texture = null;
 
         /**
+         * Background
+         */
+
+        this._background = {
+            type: ShadingBackground.COLOR,
+            data: {
+                color: UtilitiesColors.get_random_color(),
+                texture: null
+            }
+        };
+
+        /**
+         * Border
+         */
+
+        this._border = {
+            type: ShadingBorder.NONE,
+            data: {
+                width: 0,
+                color: UtilitiesColors.get_random_color(),
+                radius: 0
+            }
+        };
+
+        /**
          * Create and compile shader
          */
 
@@ -108,24 +135,62 @@ export function Rect(_scene, Primitive) {
      */
 
     Rect.prototype.compile_shader = function() {
-        this._shader_program = this._scene._context.createProgram();
-        const vertex_shader = this._scene._context.createShader(this._scene._context.VERTEX_SHADER);
-        const fragment_shader = this._scene._context.createShader(this._scene._context.FRAGMENT_SHADER);
-        this._scene._context.shaderSource(vertex_shader, VertexShader);
-        this._scene._context.shaderSource(fragment_shader, FragmentShader);
-        this._scene._context.compileShader(vertex_shader);
-        this._scene._context.compileShader(fragment_shader);
-        this._scene._context.attachShader(this._shader_program, vertex_shader);
-        this._scene._context.attachShader(this._shader_program, fragment_shader);
-        this._scene._context.linkProgram(this._shader_program);
+        this._shader_program = _scene._context.createProgram();
+        const vertex_shader = _scene._context.createShader(_scene._context.VERTEX_SHADER);
+        const fragment_shader = _scene._context.createShader(_scene._context.FRAGMENT_SHADER);
+        _scene._context.shaderSource(vertex_shader, VertexShader);
+        _scene._context.shaderSource(fragment_shader, FragmentShader);
+        _scene._context.compileShader(vertex_shader);
+        _scene._context.compileShader(fragment_shader);
+        _scene._context.attachShader(this._shader_program, vertex_shader);
+        _scene._context.attachShader(this._shader_program, fragment_shader);
+        _scene._context.linkProgram(this._shader_program);
     }
 
     /**
      * Set the background
      */
 
-    Rect.prototype.background = function(url) {
-        this._texture = url && load_texture(this._scene._context, url) || null;
+    Rect.prototype.background = function(type, ...args) {
+        switch (type) { 
+            case ShadingBackground.COLOR: {
+                this._background.type = type;
+                this._background.data.color = args[0];
+            };
+            case ShadingBackground.URL: { 
+                this._background.type = type;
+                this._background.data.texture = UtilitiesWebGL.load_texture(_scene._context, args[0]); 
+                break; 
+            } 
+        } 
+        return this;
+    };
+
+    /**
+     * Set border
+     */
+    
+    Rect.prototype.border = function(type, ...args) {
+        switch (type) { 
+            case ShadingBorder.NONE: {
+                this._border.type = type;
+            };
+            case ShadingBorder.SOLID: { 
+                this._border.type = type;
+                this._border.data.width = args[0];
+                this._border.data.color = args[1];
+                break; 
+            } 
+        } 
+        return this;
+    };
+
+    /**
+     * Set border radius
+     */
+    
+    Rect.prototype.border_radius = function(radius) {
+        this._border.data.radius = radius;
         return this;
     }
 
@@ -256,6 +321,12 @@ export function Rect(_scene, Primitive) {
             const u_sampler = _scene._context.getUniformLocation(this._shader_program, 'u_sampler');
             const u_resolution = _scene._context.getUniformLocation(this._shader_program, "u_resolution");
             const u_dimensions = _scene._context.getUniformLocation(this._shader_program, "u_dimensions");
+            const u_background_color = _scene._context.getUniformLocation(this._shader_program, 'u_background_color');
+            const u_border_color = _scene._context.getUniformLocation(this._shader_program, 'u_border_color');
+            const u_border_width = _scene._context.getUniformLocation(this._shader_program, 'u_border_width');
+            const u_border_radius = _scene._context.getUniformLocation(this._shader_program, 'u_border_radius');
+            const u_ShadingBackground = _scene._context.getUniformLocation(this._shader_program, "ShadingBackground");
+            const u_ShadingBorder = _scene._context.getUniformLocation(this._shader_program, "ShadingBorder");
 
             /**
              * Layout
@@ -278,23 +349,53 @@ export function Rect(_scene, Primitive) {
                 0.0,  1.0,
                 1.0,  0.0,
                 0.0,  0.0,
-            ]
+            ];
             _scene._context.bufferData(_scene._context.ARRAY_BUFFER, new Float32Array(texture_coordinates), _scene._context.STATIC_DRAW);
             _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, texture_coordinates_buffer);
             _scene._context.vertexAttribPointer(a_texture_coord, 2, _scene._context.FLOAT, false, 0, 0);
             _scene._context.enableVertexAttribArray(a_texture_coord);
 
-            /**
-             * Texture
-             */
-
-            if (this._texture) {
-                _scene._context.activeTexture(_scene._context.TEXTURE0);
-                _scene._context.bindTexture(_scene._context.TEXTURE_2D, this._texture);
-                _scene._context.uniform1i(u_sampler, 0);
-            } else {
-                _scene._context.bindTexture(_scene._context.TEXTURE_2D, null);
-            }
+            /** 
+             * Background 
+             */ 
+        
+            switch (this._background.type) { 
+                case ShadingBackground.COLOR: { 
+                    _scene._context.uniform1i(u_ShadingBackground, ShadingBackground.COLOR); 
+                    _scene._context.uniform4f(u_background_color, ...this._background.data.color); 
+                    _scene._context.activeTexture(_scene._context.TEXTURE0); 
+                    _scene._context.bindTexture(_scene._context.TEXTURE_2D, this._background.data.texture); 
+                    break; 
+                } 
+                case ShadingBackground.URL: { 
+                    _scene._context.uniform1i(u_sampler, 0); 
+                    _scene._context.uniform1i(u_ShadingBackground, ShadingBackground.URL); 
+                    _scene._context.uniform4f(u_background_color, 0.0, 0.0, 0.0, 1.0); 
+                    _scene._context.activeTexture(_scene._context.TEXTURE0); 
+                    _scene._context.bindTexture(_scene._context.TEXTURE_2D, this._background.data.texture); 
+                    break; 
+                } 
+            } 
+        
+            /** 
+             * Border 
+             */ 
+        
+            _scene._context.uniform1f(u_border_radius, this._border.data.radius); 
+            switch (this._border.type) { 
+                case ShadingBorder.NONE: { 
+                    _scene._context.uniform1i(u_ShadingBorder, ShadingBorder.NONE); 
+                    _scene._context.uniform1f(u_border_width, 0); 
+                    _scene._context.uniform4f(u_border_color, 0.0, 0.0, 0.0, 1.0); 
+                    break; 
+                } 
+                case ShadingBorder.SOLID: { 
+                    _scene._context.uniform1i(u_ShadingBorder, ShadingBorder.SOLID); 
+                    _scene._context.uniform1f(u_border_width, this._border.data.width); 
+                    _scene._context.uniform4f(u_border_color, ...this._border.data.color); 
+                    break; 
+                } 
+            } 
 
             /**
              * Mesh
