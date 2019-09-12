@@ -121,9 +121,11 @@ export function Scene(container, name, width, height) {
      * Rendering context
      */
 
-    this._context = this._canvas.getContext('webgl2');
+    this._context = this._canvas.getContext('webgl2', { premultiplyAlpha: false, alpha: false });
     this._context.enable(this._context.DEPTH_TEST);
     this._context.depthFunc(this._context.LEQUAL);
+    this._context.enable(this._context.BLEND);
+    this._context.blendFunc(this._context.SRC_ALPHA, this._context.ONE_MINUS_SRC_ALPHA);
 
     /**
      * Viewport
@@ -295,8 +297,9 @@ Scene.prototype.depthbuffer = function() {
  */
 
 Scene.prototype.clear = function() {
-    this._context.clearColor(0.5, 0.5, 0.5, 0.9);
-    this._context.clearDepth(1.0);
+    //this._context.colorMask(false, false, false, true);
+    this._context.clearColor(0, 0, 0, 1);
+    this._context.clearDepth(1);
     this._context.clear(this._context.COLOR_BUFFER_BIT | this._context.DEPTH_BUFFER_BIT);
 }
 
