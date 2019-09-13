@@ -41,73 +41,14 @@ void main(void) {
    }
    
    /**
-    * Border and border radius
+    * Borders
     */
 
-   if (ShadingBorder == 2) {
-      float min_x_or_y = u_border_width + u_border_radius; 
-      float max_x = u_dimensions.x - min_x_or_y;
-      float max_y = u_dimensions.y - min_x_or_y;
-      if (
-         coordinate.x > u_dimensions.x - u_border_width
-         || coordinate.x < u_border_width
-         || coordinate.y > u_dimensions.y - u_border_width
-         || coordinate.y < u_border_width
-         || (
-            u_border_radius > 0.0
-            && (
-               coordinate.x < min_x_or_y
-               && coordinate.y < min_x_or_y
-               && length(coordinate - vec2(min_x_or_y, min_x_or_y)) > u_border_radius
-            ) || (
-               coordinate.x > max_x
-               && coordinate.y > max_y
-               && length(coordinate - u_dimensions + vec2(min_x_or_y, min_x_or_y)) > u_border_radius
-            ) || (
-               coordinate.x > max_x
-               && coordinate.y < min_x_or_y
-               && length(coordinate - vec2(max_x, min_x_or_y)) > u_border_radius
-            ) || (
-               coordinate.x < min_x_or_y
-               && coordinate.y > max_y
-               && length(coordinate - vec2(min_x_or_y, max_y)) > u_border_radius
-            )
-         )
-      ) { 
-         color = u_border_color; 
-      }
-   }
+   vec2 half_dimensions = vec2(u_dimensions / 2.0);
+   vec2 round_compensation = vec2(half_dimensions.x - u_border_radius, half_dimensions.y - u_border_radius);
+   float distance = sdRoundBox(coordinate - half_dimensions, round_compensation, u_border_radius);
+   vec4 color_distance = -sign(distance) * color;
+   color = mix(color_distance, color, 1.0 - smoothstep(0.0, 2.0, abs(distance)));
    
-   /**
-    * Border radius
-    */
-
-   if (
-      u_border_radius > 0.0
-      // && (
-      //    coordinate.x < u_border_radius
-      //    && coordinate.y < u_border_radius
-      //    && length(coordinate - vec2(u_border_radius, u_border_radius)) > u_border_radius
-      // ) || (
-      //    coordinate.x > u_dimensions.x - u_border_radius
-      //    && coordinate.y > u_dimensions.y - u_border_radius
-      //    && length(coordinate - u_dimensions + vec2(u_border_radius, u_border_radius)) > u_border_radius
-      // ) || (
-      //    coordinate.x > u_dimensions.x - u_border_radius
-      //    && coordinate.y < u_border_radius
-      //    && length(coordinate - vec2(u_dimensions.x - u_border_radius, u_border_radius)) > u_border_radius
-      // ) || (
-      //    coordinate.x < u_border_radius
-      //    && coordinate.y > u_dimensions.y - u_border_radius
-      //    && length(coordinate - vec2(u_border_radius, u_dimensions.y - u_border_radius)) > u_border_radius
-      // )
-   ) {
-   }
-      vec2 p = coordinate / 100.0 - u_dimensions / 200.0;
-      float d = sdRoundBox(p, u_dimensions / 200.0, 0.0);
-      color = -sign(d) * color;
-      color = mix(color, color, 1.0 - smoothstep(0.0, 0.01, abs(d)));
-      //color.a = 1.0;
-
    gl_FragColor = color;
 }

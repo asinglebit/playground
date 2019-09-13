@@ -59,20 +59,20 @@ export const init = container => {
     const react_search_input = new scene.factory.Rect()
         .background(ShadingBackground.COLOR, UtilitiesColors.hex_to_rgba('#ffffff'))
         .border(ShadingBorder.SOLID, 2, UtilitiesColors.hex_to_rgba('#cdcdcd'))
-        .border_radius(5)
+        .border_radius(15)
         .depth(5);
 
     scene
         .root()
         .append(
             rect_background
-            // .append(rect_header)
-            // .append(
-            //     react_search_bar
-            //     .append(
-            //         react_search_input
-            //     )
-            // )
+            .append(rect_header)
+            .append(
+                react_search_bar
+                .append(
+                    react_search_input
+                )
+            )
         )
         .scene()
         .on_resize((width, height) => {
