@@ -19,16 +19,6 @@ uniform float u_border_radius;
 uniform int ShadingBackground;
 uniform int ShadingBorder;
 
-float sdEquilateralTriangle(vec2 p)
-{
-    const float k = sqrt(3.0);
-    p.x = abs(p.x) - 1.0;
-    p.y = p.y + 1.0/k;
-    if( p.x + k*p.y > 0.0 ) p = vec2( p.x - k*p.y, -k*p.x - p.y )/2.0;
-    p.x -= clamp( p.x, -2.0, 0.0 );
-    return -length(p)*sign(p.y) - 30.1;
-}
-
 float sdRoundBox( vec2 p, vec2 b, float r ) 
 {
     vec2 q = abs(p) - b;
@@ -112,11 +102,12 @@ void main(void) {
       //    && length(coordinate - vec2(u_border_radius, u_dimensions.y - u_border_radius)) > u_border_radius
       // )
    ) {
-      vec2 p = coordinate * 0.01 - u_dimensions / 200.0;
-      float d = sdRoundBox(p, u_dimensions / 500.0, 0.1);
-      color = -sign(d) * vec4(1.0,1.0,1.0,1.0);
-      color = mix(color, vec4(1.0), 1.0 - smoothstep(0.0, 0.02, abs(d)));
-}
+   }
+      vec2 p = coordinate / 100.0 - u_dimensions / 200.0;
+      float d = sdRoundBox(p, u_dimensions / 200.0, 0.0);
+      color = -sign(d) * color;
+      color = mix(color, color, 1.0 - smoothstep(0.0, 0.01, abs(d)));
+      //color.a = 1.0;
 
    gl_FragColor = color;
 }

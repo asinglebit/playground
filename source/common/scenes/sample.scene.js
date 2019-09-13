@@ -51,7 +51,7 @@ export const init = container => {
     const scene = new Manager()
         .new(container, 'scene');
     const rect_background = new scene.factory.Rect()
-        .background(ShadingBackground.COLOR, UtilitiesColors.hex_to_rgba('#f3f3f3'));
+        .background(ShadingBackground.COLOR, UtilitiesColors.hex_to_rgba('#444444'));
     const rect_header = new scene.factory.Rect()
         .background(ShadingBackground.COLOR, UtilitiesColors.hex_to_rgba('#cdcdcd'));
     const react_search_bar = new scene.factory.Rect()
@@ -66,13 +66,13 @@ export const init = container => {
         .root()
         .append(
             rect_background
-            .append(rect_header)
-            .append(
-                react_search_bar
-                .append(
-                    react_search_input
-                )
-            )
+            // .append(rect_header)
+            // .append(
+            //     react_search_bar
+            //     .append(
+            //         react_search_input
+            //     )
+            // )
         )
         .scene()
         .on_resize((width, height) => {
