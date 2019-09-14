@@ -58,7 +58,7 @@ export const init = container => {
         .background(ShadingBackground.COLOR, UtilitiesColors.hex_to_rgba('#707070'));
     const react_search_input = new scene.factory.Rect()
         .background(ShadingBackground.COLOR, UtilitiesColors.hex_to_rgba('#ffffff'))
-        .border(ShadingBorder.SOLID, 2, UtilitiesColors.hex_to_rgba('#ff0000'))
+        .border(ShadingBorder.SOLID, 15, UtilitiesColors.hex_to_rgba('#2F2300'))
         .border_radius(15)
         .depth(5);
 

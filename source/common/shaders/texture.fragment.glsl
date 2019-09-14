@@ -30,25 +30,16 @@ float op_subtract( float d1, float d2 )
    return max(-d1,d2);
 }
 
-float sd_rounded_border( vec2 p, vec2 b, float r, float border )
+float sd_rounded_border( vec2 center, vec2 outer_dimensions, vec2 inner_dimensions, float outer_radius, float inner_radius )
 {
-   vec2 half_dimensions = vec2(u_dimensions / 2.0) - vec2(border, border);
-   vec2 round_compensation = vec2(half_dimensions.x - u_border_radius , half_dimensions.y - u_border_radius);
-   return op_subtract(sd_rounded_rect(p, round_compensation, r), sd_rounded_rect(p, b, r));
-}
-
-
-vec4 draw_background(vec2 coordinate, vec4 color) {
-   vec2 half_dimensions = vec2(u_dimensions / 2.0);
-   vec2 round_compensation = vec2(half_dimensions.x - u_border_radius, half_dimensions.y - u_border_radius);
-   float distance = sd_rounded_rect(coordinate - half_dimensions, round_compensation, u_border_radius);
-   vec4 color_distance = -sign(distance) * color;
-   return mix(color_distance, u_border_color, 1.0 - smoothstep(0.0, 1.0, abs(distance)));
+   return op_subtract(sd_rounded_rect(center, inner_dimensions, inner_radius), sd_rounded_rect(center, outer_dimensions, outer_radius));
 }
 
 void main(void) {
    
    vec2 coordinate = u_dimensions * v_texture_coord;
+   vec2 half_dimensions = vec2(u_dimensions / 2.0);
+   vec2 center = coordinate - half_dimensions;
 
    /**
     * Background
@@ -62,20 +53,52 @@ void main(void) {
    }
    
    /**
-    * Borders
+    * Rect
     */
    
-   color = draw_background(coordinate, color);
+   float rect_sd = sd_rounded_rect(
+      center,
+      half_dimensions - vec2(u_border_radius),
+      u_border_radius
+   );
+   vec4 rect_color = -sign(rect_sd) * color;
+   vec4 rect_antialias_color = mix(
+      rect_color,
+      color,
+      1.0 - smoothstep(
+         0.0,
+         1.0,
+         abs(rect_sd)
+      )
+   );
    
-   float inner_radius = u_border_radius / 1.6;
-   vec2 half_dimensions = vec2(u_dimensions / 2.0);
-   vec2 round_compensation = vec2(half_dimensions.x - inner_radius, half_dimensions.y - inner_radius);
-   float distance = sd_rounded_border(coordinate - half_dimensions, round_compensation, inner_radius, u_border_radius - inner_radius / 1.6);
-   vec4 color_distance = -sign(distance) * u_border_color;
-   color_distance = mix(color_distance, u_border_color, 1.0 - smoothstep(0.0, 1.0, abs(distance)));
+   /**
+    * Border
+    */
 
-   color = mix(color, color_distance, color_distance.a * color.a);
-
+   if (ShadingBorder == 1) {
+      color = rect_antialias_color;
+   } else {
+      float u_inner_radius = u_border_radius - u_border_width;
+      float border_sd = sd_rounded_border(
+         center,
+         half_dimensions - vec2(u_border_radius),
+         half_dimensions - vec2(u_border_width + u_inner_radius),
+         u_border_radius,
+         u_inner_radius
+      );
+      vec4 border_color = -sign(border_sd) * u_border_color;
+      vec4 border_antialias_color = mix(
+         border_color,
+         u_border_color,
+         1.0 - smoothstep(0.0, 1.0, abs(border_sd))
+      );
+      color = mix(
+         rect_antialias_color,
+         border_antialias_color,
+         rect_antialias_color.a * border_antialias_color.a
+      );
+   }
 
    gl_FragColor = color;
 }
