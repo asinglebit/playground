@@ -53,17 +53,16 @@ export const init = container => {
     const rect_background = new scene.factory.Rect()
         .depth(1);
     const rect_header = new scene.factory.Rect()
-        .depth(3);
+        .depth(1);
     const react_search_bar = new scene.factory.Rect()
-        .depth(4);
+        .depth(1);
     const react_search_input = new scene.factory.Rect()
         .border(ShadingBorder.SOLID, 5, UtilitiesColors.get_random_color())
         .border_radius(15)
-        .depth(5);
+        .depth(1);
 
     scene
         .root()
-        .translate(100, 0)
         .append(
             rect_background
             .append(rect_header)
@@ -75,28 +74,41 @@ export const init = container => {
             )
         )
         .scene()
+        .timeline()
+        .clip(
+            new Clip()
+            .set(
+                scene.root(),
+                Keyframe('position_y')(Easings.LINEAR, Easings.LINEAR, 0, scene._canvas.height),
+                Keyframe('scale_y')(Easings.LINEAR, Easings.LINEAR, 0, 5),
+                Keyframe('position_y')(Easings.ELASTIC, Easings.ELASTIC, 2500, 0),
+                Keyframe('scale_y')(Easings.ELASTIC, Easings.ELASTIC, 2500, 1),
+            )
+            .set(
+                react_search_input,
+                Keyframe('rotation')(Easings.LINEAR, Easings.LINEAR, 0, 0),
+                Keyframe('rotation')(Easings.ELASTIC, Easings.ELASTIC, 10000, 3600),
+            )
+        )
+        .scene()
         .on_resize((width, height) => {
             rect_background
-                .at(width / 2, height / 2)
+                .translate(width / 2, height / 2)
+                .rotate(0)
                 .width(width)
                 .height(height);
             rect_header
-                .at(width / 2, 250 / 2)
-                .translate(0, 0)
+                .translate(0, - height / 2 + 250 / 2)
                 .width(width)
                 .height(250);
             react_search_bar
-                .at(width / 2, 150 / 2 + 200)
-                .translate(0, 0)
+                .translate(0, - height / 2 + 250 + 150 / 2)
                 .width(width)
                 .height(150)
             react_search_input
-                .at(width - 120, 60 / 2 + 270)
-                .pivot(width - 120, 60 / 2 + 270)
-                .translate(0, 0)
-                .rotate(0)
-                .width(100)
-                .height(50)
+                .translate(- width / 2 + 200 , 0)
+                .width(200)
+                .height(100)
         })
         .resize()
         .start();
