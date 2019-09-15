@@ -332,7 +332,7 @@ export function Rect(_scene, Primitive) {
              * Layout
              */
             
-            _scene._context.uniformMatrix4fv(u_matrix_cascaded, false, this._matrix_cascaded);
+            _scene._context.uniformMatrix3fv(u_matrix_cascaded, false, this._matrix_cascaded);
             _scene._context.uniform2f(u_resolution, _scene._viewport.width, _scene._viewport.height);	
             _scene._context.uniform2f(u_dimensions, this._width, this._height);
 
@@ -408,7 +408,7 @@ export function Rect(_scene, Primitive) {
                 this._points[2].x, this._points[2].y, this._depth / 5,
                 this._points[1].x, this._points[1].y, this._depth / 5,
                 this._points[0].x, this._points[0].y, this._depth / 5
-            ]);    
+            ]);
             const quad_vertex_buffer = _scene._context.createBuffer();
             _scene._context.bindBuffer(_scene._context.ARRAY_BUFFER, quad_vertex_buffer);
             _scene._context.bufferData(_scene._context.ARRAY_BUFFER, MeshQuad, _scene._context.STATIC_DRAW);

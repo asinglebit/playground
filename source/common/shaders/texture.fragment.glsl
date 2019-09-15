@@ -1,7 +1,6 @@
 precision highp float;
 
 varying highp vec2 v_texture_coord;
-varying highp vec3 v_position;
 
 uniform sampler2D u_sampler;
 uniform vec2 u_dimensions;

@@ -51,19 +51,19 @@ export const init = container => {
     const scene = new Manager()
         .new(container, 'scene');
     const rect_background = new scene.factory.Rect()
-        .background(ShadingBackground.COLOR, UtilitiesColors.hex_to_rgba('#444444'));
+        .depth(1);
     const rect_header = new scene.factory.Rect()
-        .background(ShadingBackground.COLOR, UtilitiesColors.hex_to_rgba('#cdcdcd'));
+        .depth(3);
     const react_search_bar = new scene.factory.Rect()
-        .background(ShadingBackground.COLOR, UtilitiesColors.hex_to_rgba('#707070'));
+        .depth(4);
     const react_search_input = new scene.factory.Rect()
-        .background(ShadingBackground.COLOR, UtilitiesColors.hex_to_rgba('#ffffff'))
-        .border(ShadingBorder.SOLID, 15, UtilitiesColors.hex_to_rgba('#2F2300'))
+        .border(ShadingBorder.SOLID, 5, UtilitiesColors.get_random_color())
         .border_radius(15)
         .depth(5);
 
     scene
         .root()
+        .translate(100, 0)
         .append(
             rect_background
             .append(rect_header)
@@ -82,28 +82,22 @@ export const init = container => {
                 .height(height);
             rect_header
                 .at(width / 2, 250 / 2)
+                .translate(0, 0)
                 .width(width)
                 .height(250);
             react_search_bar
                 .at(width / 2, 150 / 2 + 200)
+                .translate(0, 0)
                 .width(width)
                 .height(150)
             react_search_input
                 .at(width - 120, 60 / 2 + 270)
-                .width(200)
+                .pivot(width - 120, 60 / 2 + 270)
+                .translate(0, 0)
+                .rotate(0)
+                .width(100)
                 .height(50)
         })
         .resize()
         .start();
-
-        let scroll = 0;
-        document.addEventListener('wheel', function(event) {
-            if (event.deltaY > 0) {
-                scroll = scroll - 0.08;
-            } else {
-                scroll = scroll + 0.08;
-            }
-            rect_header.position_y = scroll;
-            react_search_bar.position_y = scroll;
-        });
 }
