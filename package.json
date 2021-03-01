@@ -80,7 +80,7 @@
         "replace-in-file": "3.4.4",
         "request": "2.88.0",
         "rxjs": "6.4.0",
-        "three": "0.102.1",
+        "three": "0.125.0",
         "ts-checker-webpack-plugin": "^0.3.0",
         "typescript": "^3.3.4000"
     }
