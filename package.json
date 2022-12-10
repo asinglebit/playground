@@ -65,7 +65,7 @@
         "corser": "2.0.1",
         "country-code-emoji": "^1.0.0",
         "cucumber": "5.1.0",
-        "express": "4.16.4",
+        "express": "4.17.3",
         "fetch-mock": "7.3.1",
         "fs-path": "0.0.24",
         "gl-matrix": "^3.1.0",
